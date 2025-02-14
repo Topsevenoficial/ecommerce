@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Star, ShoppingBag } from "lucide-react";
-import { ProductType } from "@/types/product";
+import { FlattenedProductType } from "@/types/product"; // <- OJO: importamos FlattenedProductType
 import { Badge } from "./ui/badge";
-import { useCart } from "@/hooks/use-cart"; // Hook del carrito
-import { useCartSheet } from "@/hooks/use-cart-sheet"; // Hook para controlar el Sheet
+import { useCart } from "@/hooks/use-cart";
+import { useCartSheet } from "@/hooks/use-cart-sheet";
 import { Button } from "@/components/ui/button";
 
 interface IconLabelProps {
@@ -24,10 +24,11 @@ const IconLabel: React.FC<IconLabelProps> = ({ icon, label }) => (
 );
 
 interface ProductCardProps {
-  product: ProductType;
+  product: FlattenedProductType;
+  badge?: React.ReactNode;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, badge }: ProductCardProps) {
   const router = useRouter();
   const { addItem } = useCart();
   const { setOpen: openCartSheet } = useCartSheet();
@@ -69,7 +70,6 @@ export function ProductCard({ product }: ProductCardProps) {
     ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${images[imageIndex].url}`
     : "/placeholder.png";
 
-  // Opcional: Dividir el nombre para evitar duplicados en colores
   let baseName = productName;
   let leftover = "";
   if (productName.includes(" - ")) {
@@ -79,12 +79,10 @@ export function ProductCard({ product }: ProductCardProps) {
   }
   const displayedTitle = leftover ? `${baseName} - ${leftover}` : baseName;
 
-  // Navegar a la página de detalles
   const handleViewDetails = () => {
     router.push(`/product/${slug}`);
   };
 
-  // Agregar al carrito y abrir el CartSheet. Se detiene la propagación para no activar el click del contenedor.
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     addItem(product);
@@ -104,6 +102,10 @@ export function ProductCard({ product }: ProductCardProps) {
             Destacado
           </Badge>
         )}
+
+        {/* 2. Renderizamos `badge` (si llega). 
+            Ten cuidado con la posición (clases) para no superponerse a "Destacado". */}
+        {badge}
 
         {/* Overlay "AGOTADO" si el producto no está activo */}
         {!active && (
@@ -135,10 +137,7 @@ export function ProductCard({ product }: ProductCardProps) {
               className="
                 absolute bottom-4 left-4
                 transition duration-200 z-10
-                /* Siempre visible en móvil (pantallas < md), solo aparece al hover en >= md */
-                opacity-100
-                md:opacity-0
-                md:group-hover:opacity-100
+                opacity-100 md:opacity-0 md:group-hover:opacity-100
               "
             >
               <Button

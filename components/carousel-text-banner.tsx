@@ -8,24 +8,25 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import Autoplay from "embla-carousel-autoplay";
-import { Truck, Tag, RefreshCw, Gift } from "lucide-react";
+// Importa el tipo LucideIcon y los iconos que uses
+import { LucideIcon, Truck, Tag, RefreshCw, Gift } from "lucide-react";
 
-// Declaramos el tipo de claves permitidas para el mapa de iconos
+// Declaramos las claves válidas para el icono
 type IconKey =
   | "Envíos cada día"
   | "Consigue hasta un -25% en compras superiores a 40€"
   | "Devoluciones y entregas gratuitas"
   | "Comprar novedades";
 
-// Definimos iconMap usando un Record para tipar sus claves
-const iconMap: Record<IconKey, React.ComponentType> = {
+// Mapeamos las claves a los componentes de icono concretos
+const iconMap: Record<IconKey, LucideIcon> = {
   "Envíos cada día": Truck,
   "Consigue hasta un -25% en compras superiores a 40€": Tag,
   "Devoluciones y entregas gratuitas": RefreshCw,
   "Comprar novedades": Gift,
 };
 
-// Datos del carrusel actualizados para tu marca
+// Datos de tu carrusel
 export const dataCarouselTop = [
   {
     id: 1,
@@ -77,7 +78,7 @@ const CarouselTextBanner = () => {
         >
           <CarouselContent>
             {dataCarouselTop.map(({ id, title, link, description, icon }) => {
-              // Usamos el tipo definido para iconMap
+              // Recuperamos el componente de icono correspondiente
               const IconComponent = iconMap[icon as IconKey];
               return (
                 <CarouselItem
