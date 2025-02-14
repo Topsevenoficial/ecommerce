@@ -170,7 +170,7 @@ export default function OrdenPage() {
                     customerData={customerData}
                     shippingMethod={shippingMethod}
                     orderItems={items.map((item) => ({
-                      id: item.id,
+                      id: item.id.toString(), // Convertir id a string
                       name: item.productName,
                       price: item.discount ? item.price - item.discount : item.price,
                       quantity: 1,
@@ -185,7 +185,7 @@ export default function OrdenPage() {
               {/* Sección derecha: resumen del pedido */}
               <div className="lg:sticky lg:top-8">
                 <OrderSummary
-                  items={items}
+                  items={items.map(item => ({ ...item, id: item.id.toString() }))}
                   total={total}
                   removeItem={removeItem}
                   selectedAgency={selectedAgency}
