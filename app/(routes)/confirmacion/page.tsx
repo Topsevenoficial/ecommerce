@@ -67,27 +67,17 @@ export default function ConfirmacionPage() {
     // Datos de la Orden
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text(`Número de orden: ${orderData.orderNumber}`, marginLeft, y);
+    // Usamos el id como número de orden
+    doc.text(`Número de orden: ${orderData.id}`, marginLeft, y);
     y += 8;
-    doc.text(`Fecha de compra: ${orderData.date}`, marginLeft, y);
+    // Usamos createdAt como fecha de compra (formateada)
+    doc.text(`Fecha de compra: ${new Date(orderData.createdAt).toLocaleDateString()}`, marginLeft, y);
     y += 8;
-    doc.text(
-      `Subtotal: S/ ${orderData.subtotal !== undefined ? orderData.subtotal.toFixed(2) : "0.00"}`,
-      marginLeft,
-      y
-    );
+    doc.text(`Subtotal: S/ ${orderData.subtotal.toFixed(2)}`, marginLeft, y);
     y += 8;
-    doc.text(
-      `Costo de envío: S/ ${orderData.shipping_cost !== undefined ? orderData.shipping_cost.toFixed(2) : "0.00"}`,
-      marginLeft,
-      y
-    );
+    doc.text(`Costo de envío: S/ ${orderData.shipping_cost.toFixed(2)}`, marginLeft, y);
     y += 8;
-    doc.text(
-      `Total pagado: S/ ${orderData.total !== undefined ? orderData.total.toFixed(2) : "0.00"}`,
-      marginLeft,
-      y
-    );
+    doc.text(`Total pagado: S/ ${orderData.total.toFixed(2)}`, marginLeft, y);
     y += 8;
     if (orderData.metodo_envio) {
       doc.text(`Método de envío: ${orderData.metodo_envio}`, marginLeft, y);
@@ -96,33 +86,31 @@ export default function ConfirmacionPage() {
       y += 10;
     }
 
-    // Datos del Cliente
-    if (orderData.customer) {
-      doc.setFontSize(12);
-      doc.setTextColor("#007bff");
-      doc.text("Datos del Cliente:", marginLeft, y);
-      y += 8;
-      doc.setFontSize(10);
-      doc.setTextColor(0, 0, 0);
-      doc.text(
-        `Nombre: ${orderData.customer.first_name} ${orderData.customer.last_name}`,
-        marginLeft,
-        y
-      );
-      y += 6;
-      doc.text(`Email: ${orderData.customer.email}`, marginLeft, y);
-      y += 6;
-      doc.text(`Dirección: ${orderData.customer.address}`, marginLeft, y);
-      y += 6;
-      doc.text(`Ciudad: ${orderData.customer.address_city}`, marginLeft, y);
-      y += 6;
-      doc.text(`Teléfono: ${orderData.customer.phone_number}`, marginLeft, y);
-      y += 6;
-      doc.text(`DNI: ${orderData.customer.dni}`, marginLeft, y);
-      y += 10;
-    }
+    // Datos del Cliente (accediendo directamente a las propiedades)
+    doc.setFontSize(12);
+    doc.setTextColor("#007bff");
+    doc.text("Datos del Cliente:", marginLeft, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(
+      `Nombre: ${orderData.customer_first_name} ${orderData.customer_last_name}`,
+      marginLeft,
+      y
+    );
+    y += 6;
+    doc.text(`Email: ${orderData.email}`, marginLeft, y);
+    y += 6;
+    doc.text(`Dirección: ${orderData.address}`, marginLeft, y);
+    y += 6;
+    doc.text(`Ciudad: ${orderData.address_city}`, marginLeft, y);
+    y += 6;
+    doc.text(`Teléfono: ${orderData.phone_number}`, marginLeft, y);
+    y += 6;
+    doc.text(`DNI: ${orderData.dni}`, marginLeft, y);
+    y += 10;
 
-    // Sección de Productos
+    // Sección de Productos (usando order_items)
     doc.setFontSize(12);
     doc.setTextColor("#007bff");
     doc.text("Productos:", marginLeft, y);
@@ -130,7 +118,7 @@ export default function ConfirmacionPage() {
 
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    (orderData.items ?? []).forEach((item: OrderItem) => {
+    (orderData.order_items ?? []).forEach((item: OrderItem) => {
       const itemText = `${item.name} (x${item.quantity}) - S/ ${(item.price * item.quantity).toFixed(2)}`;
       doc.text(itemText, marginLeft, y);
       y += 6;
@@ -144,7 +132,7 @@ export default function ConfirmacionPage() {
     y += 8;
     doc.text("Visite TopSeven Oficial para más productos.", marginLeft, y);
 
-    doc.save(`recibo_${orderData.orderNumber}.pdf`);
+    doc.save(`recibo_${orderData.id}.pdf`);
   };
 
   return (
@@ -154,7 +142,9 @@ export default function ConfirmacionPage() {
         <div className="text-center">
           <Check className="w-16 h-16 text-green-600 mx-auto" />
           <h1 className="mt-4 text-3xl font-bold text-green-600">¡Pago Exitoso!</h1>
-          <p className="mt-4 text-lg text-muted-foreground">Tu pago ha sido procesado correctamente.</p>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Tu pago ha sido procesado correctamente.
+          </p>
           <p className="mt-2 text-md">
             Gracias por tu compra. En breve nos pondremos en contacto vía WhatsApp para coordinar el envío de tu pedido.
           </p>
@@ -173,21 +163,15 @@ export default function ConfirmacionPage() {
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <div className="grid grid-cols-2 gap-4">
                     <p className="font-medium">Número de orden:</p>
-                    <p>{orderData.orderNumber}</p>
+                    <p>{orderData.id}</p>
                     <p className="font-medium">Fecha de compra:</p>
-                    <p>{orderData.date}</p>
+                    <p>{new Date(orderData.createdAt).toLocaleDateString()}</p>
                     <p className="font-medium">Subtotal:</p>
-                    <p>
-                      S/ {orderData.subtotal !== undefined ? orderData.subtotal.toFixed(2) : "0.00"}
-                    </p>
+                    <p>S/ {orderData.subtotal.toFixed(2)}</p>
                     <p className="font-medium">Costo de envío:</p>
-                    <p>
-                      S/ {orderData.shipping_cost !== undefined ? orderData.shipping_cost.toFixed(2) : "0.00"}
-                    </p>
+                    <p>S/ {orderData.shipping_cost.toFixed(2)}</p>
                     <p className="font-medium">Total pagado:</p>
-                    <p>
-                      S/ {orderData.total !== undefined ? orderData.total.toFixed(2) : "0.00"}
-                    </p>
+                    <p>S/ {orderData.total.toFixed(2)}</p>
                     {orderData.metodo_envio && (
                       <>
                         <p className="font-medium">Método de envío:</p>
@@ -197,39 +181,39 @@ export default function ConfirmacionPage() {
                   </div>
 
                   {/* Datos del Cliente */}
-                  {orderData.customer && (
-                    <div>
-                      <p className="font-medium mb-2">Datos del Cliente:</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <p>
-                          <strong>Nombre:</strong> {orderData.customer.first_name} {orderData.customer.last_name}
-                        </p>
-                        <p>
-                          <strong>Email:</strong> {orderData.customer.email}
-                        </p>
-                        <p>
-                          <strong>Dirección:</strong> {orderData.customer.address}
-                        </p>
-                        <p>
-                          <strong>Ciudad:</strong> {orderData.customer.address_city}
-                        </p>
-                        <p>
-                          <strong>Teléfono:</strong> {orderData.customer.phone_number}
-                        </p>
-                        <p>
-                          <strong>DNI:</strong> {orderData.customer.dni}
-                        </p>
-                      </div>
+                  <div>
+                    <p className="font-medium mb-2">Datos del Cliente:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <p>
+                        <strong>Nombre:</strong> {orderData.customer_first_name}{" "}
+                        {orderData.customer_last_name}
+                      </p>
+                      <p>
+                        <strong>Email:</strong> {orderData.email}
+                      </p>
+                      <p>
+                        <strong>Dirección:</strong> {orderData.address}
+                      </p>
+                      <p>
+                        <strong>Ciudad:</strong> {orderData.address_city}
+                      </p>
+                      <p>
+                        <strong>Teléfono:</strong> {orderData.phone_number}
+                      </p>
+                      <p>
+                        <strong>DNI:</strong> {orderData.dni}
+                      </p>
                     </div>
-                  )}
+                  </div>
 
                   {/* Productos */}
                   <div>
                     <p className="font-medium mb-2">Productos:</p>
                     <ul className="list-disc ml-6 space-y-1">
-                      {(orderData.items ?? []).map((item: OrderItem) => (
+                      {(orderData.order_items ?? []).map((item: OrderItem) => (
                         <li key={item.id} className="break-words">
-                          {item.name} (x{item.quantity}) - S/ {(item.price * item.quantity).toFixed(2)}
+                          {item.name} (x{item.quantity}) - S/{" "}
+                          {(item.price * item.quantity).toFixed(2)}
                         </li>
                       ))}
                     </ul>
