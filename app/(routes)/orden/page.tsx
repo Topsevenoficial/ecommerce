@@ -185,9 +185,9 @@ export default function OrdenPage() {
               {/* Sección derecha: resumen del pedido */}
               <div className="lg:sticky lg:top-8">
                 <OrderSummary
-                  items={items.map(item => ({ ...item, id: item.id.toString() }))}
+                  items={items.map((item) => ({ ...item, id: item.id.toString() }))}
                   total={total}
-                  removeItem={removeItem}
+                  removeItem={(id: string) => removeItem(Number(id))}  // Convertir id string a number
                   selectedAgency={selectedAgency}
                   shippingMethod={shippingMethod}
                   customerData={customerData}
