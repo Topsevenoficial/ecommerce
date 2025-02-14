@@ -1,4 +1,3 @@
-// D:/Proyecto Ecommerce NextJS/frontend-ecommerce/components/carousel-text-banner.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -11,8 +10,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import Autoplay from "embla-carousel-autoplay";
 import { Truck, Tag, RefreshCw, Gift } from "lucide-react";
 
-// Iconos para cada elemento
-const iconMap = {
+// Declaramos el tipo de claves permitidas para el mapa de iconos
+type IconKey =
+  | "Envíos cada día"
+  | "Consigue hasta un -25% en compras superiores a 40€"
+  | "Devoluciones y entregas gratuitas"
+  | "Comprar novedades";
+
+// Definimos iconMap usando un Record para tipar sus claves
+const iconMap: Record<IconKey, React.ComponentType> = {
   "Envíos cada día": Truck,
   "Consigue hasta un -25% en compras superiores a 40€": Tag,
   "Devoluciones y entregas gratuitas": RefreshCw,
@@ -71,7 +77,8 @@ const CarouselTextBanner = () => {
         >
           <CarouselContent>
             {dataCarouselTop.map(({ id, title, link, description, icon }) => {
-              const IconComponent = iconMap[icon];
+              // Usamos el tipo definido para iconMap
+              const IconComponent = iconMap[icon as IconKey];
               return (
                 <CarouselItem
                   key={id}
