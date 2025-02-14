@@ -1,4 +1,3 @@
-// D:/Proyecto Ecommerce NextJS/frontend-ecommerce/components/footer.tsx
 "use client";
 
 import Link from "next/link";

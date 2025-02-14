@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProductType } from "@/types/product";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import Image from "next/image";
 
 interface CarouselHorizontalProps {
   product: ProductType;
@@ -44,9 +45,7 @@ export function CarouselHorizontal({
   const [startPosition, setStartPosition] = React.useState({ x: 0, y: 0 });
 
   // Para pinch-to-zoom en mobile
-  const [initialDistance, setInitialDistance] = React.useState<number | null>(
-    null
-  );
+  const [initialDistance, setInitialDistance] = React.useState<number | null>(null);
 
   // Estados para swipe horizontal (cambio de imagen) en popup
   const [swipeStartX, setSwipeStartX] = React.useState<number | null>(null);
@@ -54,9 +53,7 @@ export function CarouselHorizontal({
   const SWIPE_THRESHOLD = 50; // píxeles mínimo para cambiar de imagen
 
   // Dirección de slide en el popup: "left" | "right" | ""
-  const [slideDirection, setSlideDirection] = React.useState<
-    "left" | "right" | ""
-  >("");
+  const [slideDirection, setSlideDirection] = React.useState<"left" | "right" | "">("");
 
   React.useEffect(() => {
     if (!api) return;
@@ -242,13 +239,16 @@ export function CarouselHorizontal({
                     )}
                   </div>
 
-                  <img
-                    src={imageUrl}
-                    alt={`Imagen ${index + 1}`}
-                    className="object-cover w-full h-full"
-                    onClick={() => setShowPopup(true)}
-                    style={{ cursor: "zoom-in" }}
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={imageUrl}
+                      alt={`Imagen ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      onClick={() => setShowPopup(true)}
+                      style={{ cursor: "zoom-in" }}
+                    />
+                  </div>
                 </div>
               </CarouselItem>
             ))}
@@ -315,9 +315,7 @@ export function CarouselHorizontal({
 
             {/* Imagen ampliada con animación de slide */}
             <div
-              className={`relative ${
-                isZoomed ? "cursor-grab" : "cursor-zoom-in"
-              } transition-transform duration-300 ${
+              className={`relative ${isZoomed ? "cursor-grab" : "cursor-zoom-in"} transition-transform duration-300 ${
                 slideDirection === "left"
                   ? "animate-in slide-in-from-left"
                   : slideDirection === "right"
@@ -329,17 +327,17 @@ export function CarouselHorizontal({
               <p className="absolute bottom-3 left-3 text-white text-sm z-10 bg-black bg-opacity-50 px-2 py-1 rounded">
                 {isZoomed ? "Arrastra para mover" : "Doble clic para zoom"}
               </p>
-              <img
+              <Image
                 src={images[currentIndex]}
                 alt={`Imagen ${currentIndex + 1}`}
+                draggable={false}
+                className="object-contain w-full h-auto max-h-screen"
                 style={{
                   transform: isZoomed
                     ? `scale(${zoomScale}) translate(${position.x}px, ${position.y}px)`
                     : "scale(1)",
                   transition: dragging ? "none" : "transform 0.3s ease-in-out",
                 }}
-                className="object-contain w-full h-auto max-h-screen"
-                draggable={false}
               />
             </div>
           </div>

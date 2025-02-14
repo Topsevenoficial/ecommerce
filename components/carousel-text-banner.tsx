@@ -23,15 +23,15 @@ const iconMap = {
 export const dataCarouselTop = [
   {
     id: 1,
-    title: "Envíos Express",
-    description: "Despachos en 24h para clientes VIP de TopSeven",
+    title: "Envíos cada día",
+    description: "Despachos en menos de 24h",
     link: "#",
     icon: "Envíos cada día",
   },
   {
     id: 2,
-    title: "Hasta -25% de Descuento",
-    description: "En compras superiores a S/150 con código TOPSEVEN25",
+    title: "Descuentos cada semana",
+    description: "Encuentra las mejores promociones",
     link: "#",
     icon: "Consigue hasta un -25% en compras superiores a 40€",
   },

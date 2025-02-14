@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/carousel";
 import { ChevronUp, ChevronDown } from "lucide-react"; // Flechas necesarias para escritorio
 import { ProductType } from "@/types/product";
+import Image from "next/image";
 
 // Hook para detectar pantalla móvil
 const useIsMobile = () => {
@@ -71,9 +72,7 @@ export function CarouselVertical({
       }}
       orientation={isMobile ? "horizontal" : "vertical"}
       setApi={setApi}
-      className={`${
-        isMobile ? "w-full max-w-full" : "w-[120px] max-w-[120px]" // Reducción del ancho para el carrusel vertical
-      }`}
+      className={`${isMobile ? "w-full max-w-full" : "w-[120px] max-w-[120px]"}`}
     >
       {/* Flecha Superior (visible solo en escritorio) */}
       {!isMobile && (
@@ -87,7 +86,7 @@ export function CarouselVertical({
 
       <CarouselContent
         className={`flex ${isMobile ? "flex-row" : "flex-col"} ${
-          isMobile ? "h-[140px]" : "h-[480px]" // Ajuste para mostrar 4 tarjetas completas
+          isMobile ? "h-[140px]" : "h-[480px]"
         }`}
         style={{
           overflow: "visible", // El contenedor no debe ocultar contenido
@@ -96,12 +95,10 @@ export function CarouselVertical({
         {images.map((imageUrl, index) => (
           <CarouselItem
             key={index}
-            className={`flex-shrink-0 ${
-              isMobile ? "w-[25%]" : "h-[25%]" // 4 tarjetas completas ocupando el 25%
-            } px-2`}
+            className={`flex-shrink-0 ${isMobile ? "w-[25%]" : "h-[25%]"} px-2`}
             style={{
-              flex: "0 0 calc(100% / 4)", // Ajusta el tamaño de las tarjetas a 1/4
-              maxHeight: isMobile ? "120px" : "120px", // Tamaño reducido para cada tarjeta
+              flex: "0 0 calc(100% / 4)",
+              maxHeight: isMobile ? "120px" : "120px",
               marginBottom: "4px",
             }}
             onClick={() => {
@@ -117,9 +114,10 @@ export function CarouselVertical({
                 margin: "4px",
               }}
             >
-              <img
+              <Image
                 src={imageUrl}
                 alt={`Imagen ${index + 1}`}
+                fill
                 className="object-cover w-full h-full cursor-pointer"
               />
             </div>

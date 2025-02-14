@@ -1,5 +1,3 @@
-// components/productList.tsx (actualizado)
-
 "use client";
 
 import * as React from "react";

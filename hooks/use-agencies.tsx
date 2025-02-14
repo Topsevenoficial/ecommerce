@@ -1,4 +1,3 @@
-// hooks/use-agencies.tsx
 import { useState, useEffect } from "react";
 
 export interface Agency {

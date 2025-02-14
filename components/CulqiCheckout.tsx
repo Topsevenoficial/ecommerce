@@ -237,7 +237,7 @@ const CulqiCheckout: React.FC<Props> = ({
         shipping_cost: orden.shipping_cost / 100, // Conversión de centavos a moneda
         total: orden.total / 100,               // Conversión de centavos a moneda
         metodo_envio: orden.metodo_envio,
-        items: orden.order_items,               // Se asume que este array tiene la forma correcta
+        items: orden.order_items,
         customer: {
           first_name: payment.first_name,
           last_name: payment.last_name,

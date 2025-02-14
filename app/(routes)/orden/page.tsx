@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
-import { useAgencies } from "@/hooks/use-agencies";
+import { useAgencies, Agency } from "@/hooks/use-agencies";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -44,7 +44,7 @@ export default function OrdenPage() {
     dni: "",
   });
 
-  const [selectedAgency, setSelectedAgency] = useState<any>(null);
+  const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
   const [error, setError] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<"shalom" | "olva">("shalom");
@@ -81,7 +81,7 @@ export default function OrdenPage() {
     setError("");
   };
 
-  const handleAgencySelect = (agency: any) => {
+  const handleAgencySelect = (agency: Agency) => {
     setSelectedAgency(agency);
     setCustomerData((prev) => ({
       ...prev,
@@ -172,7 +172,6 @@ export default function OrdenPage() {
                     orderItems={items.map((item) => ({
                       id: item.id,
                       name: item.productName,
-                      // si hay descuento, lo aplicas
                       price: item.discount ? item.price - item.discount : item.price,
                       quantity: 1,
                     }))}

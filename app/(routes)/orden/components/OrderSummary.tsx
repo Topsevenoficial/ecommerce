@@ -6,7 +6,17 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Truck, ArrowRight, HelpCircle } from "lucide-react";
+import {
+  X,
+  Truck,
+  ArrowRight,
+  HelpCircle,
+  CreditCard,
+  Smartphone,
+  Banknote,
+  Percent
+  // Se eliminó DollarSign ya que no se usa.
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -18,13 +28,6 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import {
-  CreditCard,
-  Smartphone,
-  Banknote,
-  DollarSign,
-  Percent,
-} from "lucide-react";
 
 interface CartItem {
   id: string;
