@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { ProductType } from "D:/Proyecto Ecommerce NextJS/frontend-ecommerce/types/product";
+import { ProductType } from "@/types/product";
 import ReactMarkdown from "react-markdown";
 
 // Componentes ShadCN
