@@ -131,7 +131,7 @@ const CulqiCheckout: React.FC<Props> = ({
 
         sessionStorage.setItem("orderData", JSON.stringify(orderDataConverted));
         toast({
-          variant: "success",
+          variant: "default",
           title: "Pago procesado correctamente",
           description: "Su pago ha sido procesado correctamente.",
         });
