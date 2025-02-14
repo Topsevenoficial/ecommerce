@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { PaymentPayload, PaymentResponse } from "@/types/payment";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
@@ -24,8 +24,6 @@ export interface OrderItemLocal {
   quantity: number;
 }
 
-// Nota: Esta interfaz local ya no se utiliza para la conversión final,
-// ya que usaremos los datos que nos devuelve el backend (orden) para la confirmación.
 export interface OrderData {
   orderNumber: string;
   date: string;
@@ -42,9 +40,9 @@ interface Props {
   customerData: CustomerData;
   shippingMethod: "shalom" | "olva";
   orderItems: OrderItem[];
-  subtotal: number;      // valor en moneda (ej. 100.00)
-  shippingCost: number;  // valor en moneda (ej. 20.00)
-  total: number;         // valor en moneda (subtotal + shippingCost)
+  subtotal: number;
+  shippingCost: number;
+  total: number;
 }
 
 const CulqiCheckout: React.FC<Props> = ({
@@ -56,18 +54,17 @@ const CulqiCheckout: React.FC<Props> = ({
   shippingCost,
   total,
 }) => {
-  // Se usa para reconfigurar el checkout; se toma el total del carrito + costo de envío.
   const { totalAmount, removeAll } = useCart();
   const baseTotal = totalAmount();
   const finalTotal = baseTotal + (shippingMethod === "olva" ? 20 : 0);
-  const totalCentavos = Math.round(finalTotal * 100); // Total en centavos para Culqi
+  const totalCentavos = Math.round(finalTotal * 100);
   const { toast } = useToast();
 
   const [isCulqiReady, setIsCulqiReady] = useState(false);
   const [checkoutOpened, setCheckoutOpened] = useState(false);
   const [hasOpenedOnce, setHasOpenedOnce] = useState(false);
 
-  const openCheckout = () => {
+  const openCheckout = useCallback(() => {
     if (typeof window !== "undefined" && window.Culqi) {
       window.Culqi.settings({
         title: "TopSeven Tienda Online",
@@ -124,7 +121,7 @@ const CulqiCheckout: React.FC<Props> = ({
       setCheckoutOpened(true);
       setHasOpenedOnce(true);
     }
-  };
+  }, [totalCentavos, order, toast]);
 
   useEffect(() => {
     const checkCulqiLoaded = setInterval(() => {
@@ -184,7 +181,7 @@ const CulqiCheckout: React.FC<Props> = ({
     }, 500);
 
     return () => clearInterval(checkCulqiLoaded);
-  }, [totalCentavos, order, toast, hasOpenedOnce]);
+  }, [totalCentavos, order, toast, hasOpenedOnce, openCheckout]);
 
   const sendTokenToBackend = async (token: string) => {
     try {
@@ -228,14 +225,13 @@ const CulqiCheckout: React.FC<Props> = ({
       const data: PaymentResponse = await response.json();
       console.log("✅ Respuesta del backend:", data);
 
-      // Extraemos el objeto 'orden' (la orden creada en Strapi) y transformamos los valores de centavos a moneda.
       const { payment, orden } = data.data;
       const orderDataConverted: OrderData = {
         orderNumber: orden.id.toString(),
         date: new Date(orden.createdAt).toLocaleDateString(),
-        subtotal: orden.subtotal / 100,         // Conversión de centavos a moneda
-        shipping_cost: orden.shipping_cost / 100, // Conversión de centavos a moneda
-        total: orden.total / 100,               // Conversión de centavos a moneda
+        subtotal: orden.subtotal / 100,
+        shipping_cost: orden.shipping_cost / 100,
+        total: orden.total / 100,
         metodo_envio: orden.metodo_envio,
         items: orden.order_items,
         customer: {
@@ -271,12 +267,7 @@ const CulqiCheckout: React.FC<Props> = ({
   return (
     <>
       {isCulqiReady && !checkoutOpened && (
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            openCheckout();
-          }}
-        >
+        <button className="btn btn-primary" onClick={() => openCheckout()}>
           Proceder al pago
         </button>
       )}

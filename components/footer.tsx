@@ -12,7 +12,7 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="text-lg font-bold">TopSeven Oficial</h3>
             <p className="text-sm text-muted-foreground">
-              "Calidad garantizada a un precio justo"
+              &quot;Calidad garantizada a un precio justo&quot;
               <br />
               Distribuidores autorizados KingSeven
               <br />
@@ -27,20 +27,17 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/garantia" className="hover:text-primary">
-                  Garantía 3 meses
+                  Garant&iacute;a 3 meses
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/preguntas-frecuentes"
-                  className="hover:text-primary"
-                >
+                <Link href="/preguntas-frecuentes" className="hover:text-primary">
                   Preguntas Frecuentes
                 </Link>
               </li>
               <li>
                 <Link href="/devoluciones" className="hover:text-primary">
-                  Política de Devoluciones
+                  Pol&iacute;tica de Devoluciones
                 </Link>
               </li>
               <li>
@@ -55,18 +52,12 @@ export function Footer() {
             <h3 className="text-lg font-bold">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  href="/terminos-condiciones"
-                  className="hover:text-primary"
-                >
-                  Términos y Condiciones
+                <Link href="/terminos-condiciones" className="hover:text-primary">
+                  T&eacute;rminos y Condiciones
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/politica-privacidad"
-                  className="hover:text-primary"
-                >
+                <Link href="/politica-privacidad" className="hover:text-primary">
                   Privacidad
                 </Link>
               </li>
@@ -78,12 +69,8 @@ export function Footer() {
             <div className="space-y-2 text-sm">
               <p>📞 +51 984 670 999</p>
               <p>📧 ventas@topsevenoficial.com</p>
-              <p>📍 Av. Prolongación Pera 650, Cusco</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2 w-full md:w-auto"
-              >
+              <p>📍 Av. Prolongaci&oacute;n Pera 650, Cusco</p>
+              <Button variant="outline" size="sm" className="mt-2 w-full md:w-auto">
                 <Link href="/whatsapp">Chat WhatsApp</Link>
               </Button>
             </div>
@@ -96,11 +83,11 @@ export function Footer() {
           <div className="text-center md:text-left">
             © 2025 TopSeven Oficial - Todos los derechos reservados
             <br />
-            "Protegiendo tu visión con calidad"
+            &quot;Protegiendo tu visi&oacute;n con calidad&quot;
           </div>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/terminos-condiciones" className="hover:text-primary">
-              Términos
+              T&eacute;rminos
             </Link>
             <Link href="/politica-privacidad" className="hover:text-primary">
               Privacidad

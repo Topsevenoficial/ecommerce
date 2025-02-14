@@ -35,26 +35,23 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export function CartSheet() {
-  // Obtenemos la ruta actual
   const pathname = usePathname();
-  // Si estamos en la página de orden ("/orden"), no renderizamos el carrito
-  if (pathname === "/orden") return null;
-
   const { items, removeItem, removeAll, totalAmount } = useCart();
   const { open, setOpen } = useCartSheet();
   const router = useRouter();
-  const [confirmClear, setConfirmClear] = useState(false);
+
+  // Si estamos en la página de orden, no mostramos el carrito
+  if (pathname === "/orden") {
+    return null;
+  }
 
   // Calcula el total aplicando descuentos
   const total = totalAmount();
-
-  // Función para limitar el número del badge (por ejemplo, 99+)
   const getDisplayCount = (count: number) => (count > 99 ? "99+" : count);
 
   return (
     <>
       <Sheet open={open} onOpenChange={setOpen}>
-        {/* Ícono del carrito */}
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" className="relative">
             <ShoppingCart className="h-5 w-5" />
@@ -66,11 +63,7 @@ export function CartSheet() {
           </Button>
         </SheetTrigger>
 
-        <SheetContent
-          side="right"
-          className="w-full max-w-md"
-          onCloseAutoFocus={(event) => event.preventDefault()}
-        >
+        <SheetContent side="right" className="w-full max-w-md" onCloseAutoFocus={(event) => event.preventDefault()}>
           <SheetHeader>
             <div className="flex items-center space-x-2">
               <SheetTitle>Carrito de Compras</SheetTitle>
@@ -85,9 +78,7 @@ export function CartSheet() {
 
           <ScrollArea className="h-[60vh] mt-4 pr-2">
             {items.length === 0 ? (
-              <div className="text-center text-muted-foreground">
-                Tu carrito está vacío.
-              </div>
+              <div className="text-center text-muted-foreground">Tu carrito está vacío.</div>
             ) : (
               items.map((item) => (
                 <Card key={item.id} className="mb-4">
@@ -105,9 +96,7 @@ export function CartSheet() {
                       />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg">
-                        {item.productName}
-                      </h3>
+                      <h3 className="font-semibold text-lg">{item.productName}</h3>
                       <div className="flex items-center space-x-2 mt-1">
                         {item.discount && item.discount > 0 ? (
                           <>
@@ -126,16 +115,11 @@ export function CartSheet() {
                       </div>
                       {item.offerType && item.offerType !== "nada" && (
                         <Badge variant="destructive" className="mt-1">
-                          {item.offerType.charAt(0).toUpperCase() +
-                            item.offerType.slice(1)}
+                          {item.offerType.charAt(0).toUpperCase() + item.offerType.slice(1)}
                         </Badge>
                       )}
                     </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeItem(item.id)}
-                    >
+                    <Button variant="destructive" size="icon" onClick={() => removeItem(item.id)}>
                       <X className="h-4 w-4" />
                     </Button>
                   </div>

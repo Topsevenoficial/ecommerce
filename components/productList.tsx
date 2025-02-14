@@ -5,7 +5,6 @@ import { ProductType, ProductVariantType } from "@/types/product";
 import useGetInStockProducts from "@/api/useGetInStockProducts";
 import { ProductCard } from "./product-card";
 import SkeletonSchema from "./skeletonSchema";
-import { Separator } from "./ui/separator";
 import { Badge } from "./ui/badge";
 
 const ProductList = () => {
@@ -42,7 +41,6 @@ const ProductList = () => {
   const flattenedProducts = result.flatMap((product: ProductType) => {
     const variants = product.product_variants || [];
     const hasVariants = variants.length > 0;
-
     return hasVariants
       ? variants.map((variant: ProductVariantType) => ({
           ...product,

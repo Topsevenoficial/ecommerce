@@ -16,6 +16,9 @@ interface InfoAdicionalProps {
   product: ProductType;
 }
 
+// Definimos el tipo Review a partir de las reseñas del producto
+type Review = ProductType["reviews"][number];
+
 function Breadcrumb({ product }: { product: ProductType }) {
   const productName = product.productName || "Producto";
   return (
@@ -28,18 +31,13 @@ function Breadcrumb({ product }: { product: ProductType }) {
         </li>
         <li className="text-muted-foreground/50">/</li>
         <li>
-          <a
-            href="/product"
-            className="text-muted-foreground hover:text-foreground"
-          >
+          <a href="/product" className="text-muted-foreground hover:text-foreground">
             Productos
           </a>
         </li>
         <li className="text-muted-foreground/50">/</li>
         <li aria-current="page" className="text-foreground font-semibold">
-          {productName.length > 20
-            ? `${productName.slice(0, 20)}...`
-            : productName}
+          {productName.length > 20 ? `${productName.slice(0, 20)}...` : productName}
         </li>
       </ol>
     </nav>
@@ -69,7 +67,6 @@ const StarRatingSelector = ({
   setRating: (value: number) => void;
 }) => {
   const [hover, setHover] = useState<number>(0);
-
   return (
     <div className="flex space-x-1">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -83,9 +80,7 @@ const StarRatingSelector = ({
           aria-label={`${star} Star`}
         >
           <Star
-            className={`h-5 w-5 ${
-              star <= (hover || rating) ? "text-yellow-500" : "text-muted"
-            }`}
+            className={`h-5 w-5 ${star <= (hover || rating) ? "text-yellow-500" : "text-muted"}`}
             fill={star <= (hover || rating) ? "currentColor" : "none"}
             strokeWidth={1.5}
           />
@@ -100,7 +95,7 @@ function AddReviewForm({
   onReviewAdded,
 }: {
   productId: number;
-  onReviewAdded: (newReview: any) => void;
+  onReviewAdded: (newReview: Review) => void;
 }) {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -110,12 +105,10 @@ function AddReviewForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email) {
       setError("Por favor, completa este campo.");
       return;
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
       setError(
@@ -123,7 +116,6 @@ function AddReviewForm({
       );
       return;
     }
-
     try {
       const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews`;
       const payload = {
@@ -134,7 +126,6 @@ function AddReviewForm({
           product: productId,
         },
       };
-
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -143,58 +134,47 @@ function AddReviewForm({
         },
         body: JSON.stringify(payload),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
-        const errorMessage =
-          data?.error?.message || `Error: ${response.status}`;
+        const errorMessage = data?.error?.message || `Error: ${response.status}`;
         throw new Error(errorMessage);
       }
-
-      const newReview = data.data;
-
+      const newReview: Review = data.data;
       toast({
         title: "✅ Reseña enviada",
         description: "Tu opinión ha sido publicada correctamente",
       });
-
       onReviewAdded({
         ...newReview,
         id: newReview?.id || Date.now(),
       });
-
       setEmail("");
       setRating(5);
       setDescription("");
       setError("");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      let errorMsg = "Ocurrió un problema al enviar la reseña";
+      if (err instanceof Error) {
+        errorMsg = err.message;
+      }
       console.error(err);
       toast({
         variant: "destructive",
         title: "❌ Error",
-        description: err.message || "Ocurrió un problema al enviar la reseña",
+        description: errorMsg,
       });
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="bg-card rounded-lg shadow-sm border p-4 sm:p-6"
-    >
+    <form onSubmit={handleSubmit} noValidate className="bg-card rounded-lg shadow-sm border p-4 sm:p-6">
       <div className="space-y-5">
-        <h3 className="font-semibold text-lg border-b pb-3">
-          Dejar una reseña
-        </h3>
-
+        <h3 className="font-semibold text-lg border-b pb-3">Dejar una reseña</h3>
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
         <div>
           <label className="block mb-2 text-sm font-medium">Email</label>
           <Input
@@ -208,12 +188,10 @@ function AddReviewForm({
             placeholder="tucorreo@ejemplo.com"
           />
         </div>
-
         <div>
           <label className="block mb-2 text-sm font-medium">Valoración</label>
           <StarRatingSelector rating={rating} setRating={setRating} />
         </div>
-
         <div>
           <label className="block mb-2 text-sm font-medium">Comentario</label>
           <Textarea
@@ -224,7 +202,6 @@ function AddReviewForm({
             placeholder="Escribe tu experiencia con el producto..."
           />
         </div>
-
         <Button type="submit" className="w-full">
           Enviar Reseña
         </Button>
@@ -233,7 +210,7 @@ function AddReviewForm({
   );
 }
 
-function ReviewsList({ reviews }: { reviews: ProductType["reviews"] }) {
+function ReviewsList({ reviews }: { reviews: Review[] }) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const prevReviewsLength = useRef(reviews?.length || 0);
 
@@ -247,9 +224,7 @@ function ReviewsList({ reviews }: { reviews: ProductType["reviews"] }) {
 
   const totalReviews = reviews?.length || 0;
   const averageRating =
-    totalReviews > 0
-      ? reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews
-      : 0;
+    totalReviews > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews : 0;
 
   return (
     <>
@@ -258,15 +233,13 @@ function ReviewsList({ reviews }: { reviews: ProductType["reviews"] }) {
           <div className="flex items-center gap-2">
             <StarRating rating={Math.round(averageRating)} />
             <span className="text-sm text-muted-foreground">
-              {averageRating.toFixed(1)} de 5 ({totalReviews} reseña
-              {totalReviews !== 1 ? "s" : ""})
+              {averageRating.toFixed(1)} de 5 ({totalReviews} reseña{totalReviews !== 1 ? "s" : ""})
             </span>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">No hay reseñas aún</p>
         )}
       </div>
-
       <ScrollArea ref={scrollAreaRef} className="h-[300px] sm:h-80">
         <div className="space-y-4 pr-3">
           {reviews && reviews.length > 0
@@ -288,14 +261,11 @@ function ReviewsList({ reviews }: { reviews: ProductType["reviews"] }) {
                           {review.email}
                         </p>
                         <time className="text-xs text-muted-foreground">
-                          {new Date(review.createdAt).toLocaleDateString(
-                            "es-ES",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )}
+                          {new Date(review.createdAt).toLocaleDateString("es-ES", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                         </time>
                       </div>
                       <StarRating rating={review.rating} />
@@ -316,20 +286,17 @@ function ReviewsList({ reviews }: { reviews: ProductType["reviews"] }) {
 }
 
 export default function InfoAdicional({ product }: InfoAdicionalProps) {
-  const [reviews, setReviews] = useState(product.reviews || []);
-
-  const handleNewReview = (newReview: any) => {
+  const [reviews, setReviews] = useState<Review[]>(product.reviews || []);
+  const handleNewReview = (newReview: Review) => {
     setReviews((prev) => [newReview, ...prev]);
   };
 
   if (!product) return null;
-
   const { description } = product;
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <Breadcrumb product={product} />
-
       <Tabs defaultValue="description" className="w-full">
         <TabsList className="flex flex-nowrap sm:justify-center w-full overflow-x-auto">
           <TabsTrigger value="description" className="flex-shrink-0">
@@ -339,7 +306,6 @@ export default function InfoAdicional({ product }: InfoAdicionalProps) {
             Reseñas
           </TabsTrigger>
         </TabsList>
-
         <TabsContent value="description" className="pt-4 text-center">
           {description ? (
             <div className="text-sm leading-relaxed max-w-2xl mx-auto px-4">
@@ -351,18 +317,13 @@ export default function InfoAdicional({ product }: InfoAdicionalProps) {
             </p>
           )}
         </TabsContent>
-
         <TabsContent value="reviews" className="pt-4">
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="w-full lg:w-[60%]">
               <ReviewsList reviews={reviews} />
             </div>
-
             <div className="w-full lg:w-[40%]">
-              <AddReviewForm
-                productId={product.id}
-                onReviewAdded={handleNewReview}
-              />
+              <AddReviewForm productId={product.id} onReviewAdded={handleNewReview} />
             </div>
           </div>
         </TabsContent>
