@@ -30,9 +30,9 @@ export interface PaymentData {
   email: string;
   amount: number;
   payment_status: string | null;
-  culqi_response: any;
+  culqi_response: unknown;
   customer_id: string | null;
-  customer_data: any;
+  customer_data: unknown;
   first_name: string;
   last_name: string;
   address: string;
@@ -48,12 +48,13 @@ export interface PaymentData {
 
 /**
  * Estructura final de la respuesta que envía Strapi cuando el pago se crea.
+ * Se asume que el objeto "orden" tiene la misma estructura que tu OrderData definido en /types/order.
  */
+import { OrderData } from "./order";
 export interface PaymentResponse {
   message: string;
   data: {
     payment: PaymentData;
-    // Puedes definir un tipo para la orden si lo deseas, o dejarlo como any
-    orden: any;
+    orden: OrderData;
   };
 }

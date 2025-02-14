@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import useGetInStockProducts from "@/api/useGetInStockProducts";
-import { ProductType, ProductVariantType } from "@/types/product";
+import { ProductType } from "@/types/product"; // Ya NO importamos ProductVariantType
 import SkeletonSchema from "./skeletonSchema";
 
 // Importa la misma tarjeta genérica
@@ -55,20 +55,8 @@ const InStockProducts = () => {
     );
   }
 
-  // 🛠️ Aplanar productos & variantes
-  const flattenedProducts = products.flatMap((product: ProductType) => {
-    if (product.product_variants?.length) {
-      return product.product_variants.map((variant: ProductVariantType) => ({
-        ...product,
-        id: `${product.id}-variant-${variant.id}`,
-        productName: `${product.productName} - ${variant.colorMontura}/${variant.colorLente}`,
-        images: variant.images?.length ? variant.images : product.images,
-        variantId: variant.id,
-      }));
-    }
-    // Si no tiene variantes, se retorna el producto tal cual
-    return [product];
-  });
+  // Simplemente usamos la lista que llega, sin “aplanar” variantes
+  const inStockProducts = products;
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
@@ -79,12 +67,12 @@ const InStockProducts = () => {
       {/* ✅ Carrusel de productos */}
       <Carousel className="relative w-full">
         <CarouselContent className="space-x-4 scrollbar-hide">
-          {flattenedProducts.map((product: ProductType) => (
+          {inStockProducts.map((product: ProductType) => (
             <CarouselItem
               key={product.id}
               className="md:basis-1/2 lg:basis-1/3"
             >
-              {/* Reutilizamos la tarjeta FeaturedProductCard */}
+              {/* Reutilizamos la tarjeta genérica */}
               <ProductCard product={product} />
             </CarouselItem>
           ))}

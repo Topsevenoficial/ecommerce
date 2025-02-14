@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Star, ShoppingBag } from "lucide-react";
-import { FlattenedProductType } from "@/types/product"; // <- OJO: importamos FlattenedProductType
+import { FlattenedProductType, ProductType } from "@/types/product"; // <- OJO: importamos FlattenedProductType
 import { Badge } from "./ui/badge";
 import { useCart } from "@/hooks/use-cart";
 import { useCartSheet } from "@/hooks/use-cart-sheet";
 import { Button } from "@/components/ui/button";
+
 
 interface IconLabelProps {
   icon: React.ReactElement;
@@ -24,7 +25,7 @@ const IconLabel: React.FC<IconLabelProps> = ({ icon, label }) => (
 );
 
 interface ProductCardProps {
-  product: FlattenedProductType;
+  product: ProductType | FlattenedProductType;
   badge?: React.ReactNode;
 }
 

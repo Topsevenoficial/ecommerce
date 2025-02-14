@@ -69,10 +69,8 @@ export default function ConfirmacionPage() {
     // Datos de la Orden
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    // Usamos el id como número de orden
     doc.text(`Número de orden: ${orderData.id}`, marginLeft, y);
     y += 8;
-    // Usamos createdAt como fecha de compra (formateada)
     doc.text(
       `Fecha de compra: ${new Date(orderData.createdAt).toLocaleDateString()}`,
       marginLeft,
@@ -91,12 +89,15 @@ export default function ConfirmacionPage() {
     y += 8;
     if (orderData.metodo_envio) {
       doc.text(`Método de envío: ${orderData.metodo_envio}`, marginLeft, y);
-      y += 10;
-    } else {
-      y += 10;
+      y += 8;
     }
+    // Campos adicionales del OrderData
+    doc.text(`Código de país: ${orderData.country_code}`, marginLeft, y);
+    y += 8;
+    doc.text(`Estado de la orden: ${orderData.order_status}`, marginLeft, y);
+    y += 10;
 
-    // Datos del Cliente (accediendo directamente a las propiedades)
+    // Datos del Cliente
     doc.setFontSize(12);
     doc.setTextColor("#007bff");
     doc.text("Datos del Cliente:", marginLeft, y);
@@ -120,7 +121,7 @@ export default function ConfirmacionPage() {
     doc.text(`DNI: ${orderData.dni}`, marginLeft, y);
     y += 10;
 
-    // Sección de Productos (usando order_items)
+    // Sección de Productos
     doc.setFontSize(12);
     doc.setTextColor("#007bff");
     doc.text("Productos:", marginLeft, y);
@@ -180,7 +181,9 @@ export default function ConfirmacionPage() {
                     <p className="font-medium">Número de orden:</p>
                     <p>{orderData.id}</p>
                     <p className="font-medium">Fecha de compra:</p>
-                    <p>{new Date(orderData.createdAt).toLocaleDateString()}</p>
+                    <p>
+                      {new Date(orderData.createdAt).toLocaleDateString()}
+                    </p>
                     <p className="font-medium">Subtotal:</p>
                     <p>S/ {orderData.subtotal.toFixed(2)}</p>
                     <p className="font-medium">Costo de envío:</p>
@@ -193,6 +196,10 @@ export default function ConfirmacionPage() {
                         <p>{orderData.metodo_envio}</p>
                       </>
                     )}
+                    <p className="font-medium">Código de país:</p>
+                    <p>{orderData.country_code}</p>
+                    <p className="font-medium">Estado de la orden:</p>
+                    <p>{orderData.order_status}</p>
                   </div>
 
                   {/* Datos del Cliente */}
@@ -200,7 +207,8 @@ export default function ConfirmacionPage() {
                     <p className="font-medium mb-2">Datos del Cliente:</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <p>
-                        <strong>Nombre:</strong> {orderData.customer_first_name}{" "}
+                        <strong>Nombre:</strong>{" "}
+                        {orderData.customer_first_name}{" "}
                         {orderData.customer_last_name}
                       </p>
                       <p>
@@ -225,12 +233,14 @@ export default function ConfirmacionPage() {
                   <div>
                     <p className="font-medium mb-2">Productos:</p>
                     <ul className="list-disc ml-6 space-y-1">
-                      {(orderData.order_items ?? []).map((item: OrderItem) => (
-                        <li key={item.id} className="break-words">
-                          {item.name} (x{item.quantity}) - S/{" "}
-                          {(item.price * item.quantity).toFixed(2)}
-                        </li>
-                      ))}
+                      {(orderData.order_items ?? []).map(
+                        (item: OrderItem) => (
+                          <li key={item.id} className="break-words">
+                            {item.name} (x{item.quantity}) - S/{" "}
+                            {(item.price * item.quantity).toFixed(2)}
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
                 </div>

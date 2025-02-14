@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import useGetFeaturedProducts from "@/api/useGetFeaturedProducts";
-import { ProductType, ProductVariantType } from "@/types/product";
+import { ProductType } from "@/types/product";
 import SkeletonSchema from "./skeletonSchema";
 
 // Importamos la tarjeta "genérica"
@@ -51,28 +51,6 @@ const FeaturedProducts = () => {
     );
   }
 
-  /**
-   * Transformar productos para mostrar cada variante como un producto individual.
-   */
-  const flattenedProducts = result.flatMap((product: ProductType) => {
-    if (product.product_variants?.length > 0) {
-      // Si el producto tiene variantes, mostramos cada variante
-      return product.product_variants.map((variant: ProductVariantType) => ({
-        ...product,
-        id: `${product.id}-variant-${variant.id}`, // Crear un ID único
-        productName: `${product.productName} - ${variant.colorMontura}/${variant.colorLente}`,
-        images: variant.images?.length ? variant.images : product.images,
-        // Mantener el precio del producto principal (o ajustarlo si lo deseas)
-        price: product.price,
-        // Guardar el ID de la variante
-        variantId: variant.id,
-      }));
-    }
-
-    // Si no tiene variantes, devolver el producto tal cual
-    return [product];
-  });
-
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
       <h3 className="text-4xl font-extrabold tracking-tight mb-4 sm:mb-8 text-foreground dark:text-foreground">
@@ -81,7 +59,7 @@ const FeaturedProducts = () => {
 
       <Carousel className="relative w-full">
         <CarouselContent className="space-x-4 scrollbar-hide">
-          {flattenedProducts.map((product: ProductType) => (
+          {result.map((product: ProductType) => (
             <CarouselItem
               key={product.id}
               className="md:basis-1/2 lg:basis-1/3"

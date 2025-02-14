@@ -24,16 +24,8 @@ export interface OrderItemLocal {
   quantity: number;
 }
 
-export interface OrderData {
-  orderNumber: string;
-  date: string;
-  subtotal: number;
-  shipping_cost: number;
-  total: number;
-  metodo_envio: "shalom" | "olva";
-  items: OrderItemLocal[];
-  customer?: CustomerData;
-}
+// Usamos el type OrderData de "@/types/order" para la conversión
+import { OrderData } from "@/types/order";
 
 interface Props {
   order?: string;
@@ -109,24 +101,27 @@ const CulqiCheckout: React.FC<Props> = ({
         console.log("✅ Respuesta del backend:", data);
 
         const { payment, orden } = data.data;
+
+        // Mapeamos la respuesta al type OrderData (asegurándonos de tener la estructura correcta)
         const orderDataConverted: OrderData = {
-          orderNumber: orden.id.toString(),
-          date: new Date(orden.createdAt).toLocaleDateString(),
+          id: orden.id,
+          customer_first_name: payment.first_name,
+          customer_last_name: payment.last_name,
+          email: payment.email,
+          phone_number: payment.phone_number,
+          dni: payment.dni,
+          address: payment.address,
+          address_city: payment.address_city,
+          country_code: payment.country_code,
+          metodo_envio: orden.metodo_envio,
+          order_items: orden.order_items, // Se espera que cumpla con el type OrderItem[]
           subtotal: orden.subtotal / 100,
           shipping_cost: orden.shipping_cost / 100,
           total: orden.total / 100,
-          metodo_envio: orden.metodo_envio,
-          items: orden.order_items,
-          customer: {
-            first_name: payment.first_name,
-            last_name: payment.last_name,
-            email: payment.email,
-            address: payment.address,
-            address_city: payment.address_city,
-            country_code: payment.country_code,
-            phone_number: payment.phone_number,
-            dni: payment.dni.toString(),
-          },
+          order_status: orden.order_status || "pendiente", // Asigna un valor por defecto si es necesario
+          createdAt: orden.createdAt,
+          updatedAt: orden.updatedAt,
+          publishedAt: orden.publishedAt,
         };
 
         sessionStorage.setItem("orderData", JSON.stringify(orderDataConverted));
