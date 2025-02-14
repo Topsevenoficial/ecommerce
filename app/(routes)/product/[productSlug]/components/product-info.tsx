@@ -68,12 +68,10 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const { addItem } = useCart();
   const { setOpen } = useCartSheet();
 
-  // Determinamos si existe descuento
-  const hasDiscount = (product.discount ?? 0) > 0;
-  const discountAmount = hasDiscount ? product.discount : 0;
-  const discountedPrice = hasDiscount
-    ? product.price - discountAmount
-    : product.price;
+  // Calculamos el descuento garantizando que sea un número
+  const discountAmount = product.discount ?? 0;
+  const hasDiscount = discountAmount > 0;
+  const discountedPrice = product.price - discountAmount;
 
   // Memorizar los valores formateados para evitar discrepancias en el renderizado
   const formattedOriginalPrice = useMemo(
