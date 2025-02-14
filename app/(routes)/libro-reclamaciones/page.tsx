@@ -118,9 +118,7 @@ export default function LibroReclamacionesPage() {
             required
           />
         </div>
-        <Button type="submit" variant="primary">
-          Enviar Reclamación
-        </Button>
+        <Button type="submit">Enviar Reclamación</Button>
       </form>
     </main>
   );
