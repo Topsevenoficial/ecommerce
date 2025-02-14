@@ -64,6 +64,101 @@ const CulqiCheckout: React.FC<Props> = ({
   const [checkoutOpened, setCheckoutOpened] = useState(false);
   const [hasOpenedOnce, setHasOpenedOnce] = useState(false);
 
+  // Definimos sendTokenToBackend con useCallback para estabilizar su identidad
+  const sendTokenToBackend = useCallback(
+    async (token: string) => {
+      try {
+        const payload: PaymentPayload = {
+          token,
+          amount: totalCentavos,
+          email: customerData.email,
+          first_name: customerData.first_name,
+          last_name: customerData.last_name,
+          address: customerData.address,
+          address_city: customerData.address_city,
+          country_code: customerData.country_code,
+          phone_number: customerData.phone_number,
+          dni: Number(customerData.dni),
+          metodo_envio: shippingMethod,
+          order_items: orderItems,
+          subtotal: subtotal,
+          shipping_cost: shippingCost,
+          total: total,
+        };
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/process-payment`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!response.ok) {
+          console.error("❌ Error HTTP:", response.status);
+          toast({
+            variant: "destructive",
+            title: "Error al procesar el pago",
+            description: `Hubo un error al procesar el pago: ${response.status}`,
+          });
+          return;
+        }
+
+        const data: PaymentResponse = await response.json();
+        console.log("✅ Respuesta del backend:", data);
+
+        const { payment, orden } = data.data;
+        const orderDataConverted: OrderData = {
+          orderNumber: orden.id.toString(),
+          date: new Date(orden.createdAt).toLocaleDateString(),
+          subtotal: orden.subtotal / 100,
+          shipping_cost: orden.shipping_cost / 100,
+          total: orden.total / 100,
+          metodo_envio: orden.metodo_envio,
+          items: orden.order_items,
+          customer: {
+            first_name: payment.first_name,
+            last_name: payment.last_name,
+            email: payment.email,
+            address: payment.address,
+            address_city: payment.address_city,
+            country_code: payment.country_code,
+            phone_number: payment.phone_number,
+            dni: payment.dni.toString(),
+          },
+        };
+
+        sessionStorage.setItem("orderData", JSON.stringify(orderDataConverted));
+        toast({
+          variant: "success",
+          title: "Pago procesado correctamente",
+          description: "Su pago ha sido procesado correctamente.",
+        });
+        removeAll();
+        window.location.href = "/confirmacion";
+      } catch (error) {
+        console.error("❌ Error al enviar el token al backend:", error);
+        toast({
+          variant: "destructive",
+          title: "Error al procesar el pago",
+          description: "Hubo un error al procesar el pago.",
+        });
+      }
+    },
+    [
+      totalCentavos,
+      customerData,
+      shippingMethod,
+      orderItems,
+      subtotal,
+      shippingCost,
+      total,
+      toast,
+      removeAll,
+    ]
+  );
+
   const openCheckout = useCallback(() => {
     if (typeof window !== "undefined" && window.Culqi) {
       window.Culqi.settings({
@@ -89,7 +184,7 @@ const CulqiCheckout: React.FC<Props> = ({
           cuotealo: true,
         },
         style: {
-          logo: "https://topsevenoficial.com/logo.png",
+          logo: "/images/mini-logo.png", // Ruta correcta
           bannerColor: "#000000",
           buttonBackground: "#007bff",
           menuColor: "#000000",
@@ -121,7 +216,7 @@ const CulqiCheckout: React.FC<Props> = ({
       setCheckoutOpened(true);
       setHasOpenedOnce(true);
     }
-  }, [totalCentavos, order, toast]);
+  }, [totalCentavos, order, toast, sendTokenToBackend]);
 
   useEffect(() => {
     const checkCulqiLoaded = setInterval(() => {
@@ -155,7 +250,7 @@ const CulqiCheckout: React.FC<Props> = ({
             cuotealo: true,
           },
           style: {
-            logo: "https://topsevenoficial.com/logo.png",
+            logo: "/images/mini-logo.png", // Ruta correcta
             bannerColor: "#000000",
             buttonBackground: "#007bff",
             menuColor: "#000000",
@@ -182,87 +277,6 @@ const CulqiCheckout: React.FC<Props> = ({
 
     return () => clearInterval(checkCulqiLoaded);
   }, [totalCentavos, order, toast, hasOpenedOnce, openCheckout]);
-
-  const sendTokenToBackend = async (token: string) => {
-    try {
-      const payload: PaymentPayload = {
-        token,
-        amount: totalCentavos,
-        email: customerData.email,
-        first_name: customerData.first_name,
-        last_name: customerData.last_name,
-        address: customerData.address,
-        address_city: customerData.address_city,
-        country_code: customerData.country_code,
-        phone_number: customerData.phone_number,
-        dni: Number(customerData.dni),
-        metodo_envio: shippingMethod,
-        order_items: orderItems,
-        subtotal: subtotal,
-        shipping_cost: shippingCost,
-        total: total,
-      };
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/process-payment`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!response.ok) {
-        console.error("❌ Error HTTP:", response.status);
-        toast({
-          variant: "destructive",
-          title: "Error al procesar el pago",
-          description: `Hubo un error al procesar el pago: ${response.status}`,
-        });
-        return;
-      }
-
-      const data: PaymentResponse = await response.json();
-      console.log("✅ Respuesta del backend:", data);
-
-      const { payment, orden } = data.data;
-      const orderDataConverted: OrderData = {
-        orderNumber: orden.id.toString(),
-        date: new Date(orden.createdAt).toLocaleDateString(),
-        subtotal: orden.subtotal / 100,
-        shipping_cost: orden.shipping_cost / 100,
-        total: orden.total / 100,
-        metodo_envio: orden.metodo_envio,
-        items: orden.order_items,
-        customer: {
-          first_name: payment.first_name,
-          last_name: payment.last_name,
-          email: payment.email,
-          address: payment.address,
-          address_city: payment.address_city,
-          country_code: payment.country_code,
-          phone_number: payment.phone_number,
-          dni: payment.dni.toString(),
-        },
-      };
-
-      sessionStorage.setItem("orderData", JSON.stringify(orderDataConverted));
-      toast({
-        variant: "success",
-        title: "Pago procesado correctamente",
-        description: "Su pago ha sido procesado correctamente.",
-      });
-      removeAll();
-      window.location.href = "/confirmacion";
-    } catch (error) {
-      console.error("❌ Error al enviar el token al backend:", error);
-      toast({
-        variant: "destructive",
-        title: "Error al procesar el pago",
-        description: "Hubo un error al procesar el pago.",
-      });
-    }
-  };
 
   return (
     <>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "@/hooks/use-cart";
@@ -63,7 +63,11 @@ export function CartSheet() {
           </Button>
         </SheetTrigger>
 
-        <SheetContent side="right" className="w-full max-w-md" onCloseAutoFocus={(event) => event.preventDefault()}>
+        <SheetContent
+          side="right"
+          className="w-full max-w-md"
+          onCloseAutoFocus={(event) => event.preventDefault()}
+        >
           <SheetHeader>
             <div className="flex items-center space-x-2">
               <SheetTitle>Carrito de Compras</SheetTitle>
@@ -78,7 +82,9 @@ export function CartSheet() {
 
           <ScrollArea className="h-[60vh] mt-4 pr-2">
             {items.length === 0 ? (
-              <div className="text-center text-muted-foreground">Tu carrito está vacío.</div>
+              <div className="text-center text-muted-foreground">
+                Tu carrito está vacío.
+              </div>
             ) : (
               items.map((item) => (
                 <Card key={item.id} className="mb-4">
@@ -96,7 +102,9 @@ export function CartSheet() {
                       />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{item.productName}</h3>
+                      <h3 className="font-semibold text-lg">
+                        {item.productName}
+                      </h3>
                       <div className="flex items-center space-x-2 mt-1">
                         {item.discount && item.discount > 0 ? (
                           <>
@@ -115,11 +123,16 @@ export function CartSheet() {
                       </div>
                       {item.offerType && item.offerType !== "nada" && (
                         <Badge variant="destructive" className="mt-1">
-                          {item.offerType.charAt(0).toUpperCase() + item.offerType.slice(1)}
+                          {item.offerType.charAt(0).toUpperCase() +
+                            item.offerType.slice(1)}
                         </Badge>
                       )}
                     </div>
-                    <Button variant="destructive" size="icon" onClick={() => removeItem(item.id)}>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => removeItem(item.id)}
+                    >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
