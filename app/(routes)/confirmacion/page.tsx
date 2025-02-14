@@ -49,7 +49,9 @@ export default function ConfirmacionPage() {
     doc.setTextColor(0, 0, 0);
     doc.text("RUC: 1073602011", pageWidth / 2, y, { align: "center" });
     y += 6;
-    doc.text("Av Prolongación Pera 650, Cusco", pageWidth / 2, y, { align: "center" });
+    doc.text("Av Prolongación Pera 650, Cusco", pageWidth / 2, y, {
+      align: "center",
+    });
     y += 12;
 
     // Título del Recibo
@@ -71,11 +73,19 @@ export default function ConfirmacionPage() {
     doc.text(`Número de orden: ${orderData.id}`, marginLeft, y);
     y += 8;
     // Usamos createdAt como fecha de compra (formateada)
-    doc.text(`Fecha de compra: ${new Date(orderData.createdAt).toLocaleDateString()}`, marginLeft, y);
+    doc.text(
+      `Fecha de compra: ${new Date(orderData.createdAt).toLocaleDateString()}`,
+      marginLeft,
+      y
+    );
     y += 8;
     doc.text(`Subtotal: S/ ${orderData.subtotal.toFixed(2)}`, marginLeft, y);
     y += 8;
-    doc.text(`Costo de envío: S/ ${orderData.shipping_cost.toFixed(2)}`, marginLeft, y);
+    doc.text(
+      `Costo de envío: S/ ${orderData.shipping_cost.toFixed(2)}`,
+      marginLeft,
+      y
+    );
     y += 8;
     doc.text(`Total pagado: S/ ${orderData.total.toFixed(2)}`, marginLeft, y);
     y += 8;
@@ -119,7 +129,9 @@ export default function ConfirmacionPage() {
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     (orderData.order_items ?? []).forEach((item: OrderItem) => {
-      const itemText = `${item.name} (x${item.quantity}) - S/ ${(item.price * item.quantity).toFixed(2)}`;
+      const itemText = `${item.name} (x${item.quantity}) - S/ ${(
+        item.price * item.quantity
+      ).toFixed(2)}`;
       doc.text(itemText, marginLeft, y);
       y += 6;
     });
@@ -141,12 +153,15 @@ export default function ConfirmacionPage() {
         {/* Encabezado de confirmación */}
         <div className="text-center">
           <Check className="w-16 h-16 text-green-600 mx-auto" />
-          <h1 className="mt-4 text-3xl font-bold text-green-600">¡Pago Exitoso!</h1>
+          <h1 className="mt-4 text-3xl font-bold text-green-600">
+            ¡Pago Exitoso!
+          </h1>
           <p className="mt-4 text-lg text-muted-foreground">
             Tu pago ha sido procesado correctamente.
           </p>
           <p className="mt-2 text-md">
-            Gracias por tu compra. En breve nos pondremos en contacto vía WhatsApp para coordinar el envío de tu pedido.
+            Gracias por tu compra. En breve nos pondremos en contacto vía
+            WhatsApp para coordinar el envío de tu pedido.
           </p>
         </div>
 
@@ -228,12 +243,15 @@ export default function ConfirmacionPage() {
           </p>
         )}
 
-        <Alert variant="info" className="mt-6">
+        <Alert variant="default" className="mt-6">
           <Info className="w-5 h-5 mr-2" />
           <div>
-            <AlertTitle className="font-medium">Coordinación de envío</AlertTitle>
+            <AlertTitle className="font-medium">
+              Coordinación de envío
+            </AlertTitle>
             <AlertDescription className="text-sm">
-              Nos pondremos en contacto contigo por WhatsApp en las próximas horas para confirmar la dirección y coordinar la entrega.
+              Nos pondremos en contacto contigo por WhatsApp en las próximas
+              horas para confirmar la dirección y coordinar la entrega.
             </AlertDescription>
           </div>
         </Alert>
@@ -242,7 +260,11 @@ export default function ConfirmacionPage() {
           <Button variant="default" asChild className="w-full sm:w-auto">
             <a href="/">Volver a la tienda</a>
           </Button>
-          <Button variant="outline" onClick={generatePDF} className="w-full sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={generatePDF}
+            className="w-full sm:w-auto"
+          >
             Descargar Recibo
           </Button>
         </div>
