@@ -12,12 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 
+// Se asume que la propiedad reviews es opcional en ProductType; para el tipo Review,
+// usaremos: si no existe, se tratará como un array vacío.
+type Review = ProductType["reviews"] extends (infer R)[] ? R : never;
+
 interface InfoAdicionalProps {
   product: ProductType;
 }
-
-// Definimos el tipo Review a partir de las reseñas del producto
-type Review = ProductType["reviews"][number];
 
 function Breadcrumb({ product }: { product: ProductType }) {
   const productName = product.productName || "Producto";
@@ -37,7 +38,9 @@ function Breadcrumb({ product }: { product: ProductType }) {
         </li>
         <li className="text-muted-foreground/50">/</li>
         <li aria-current="page" className="text-foreground font-semibold">
-          {productName.length > 20 ? `${productName.slice(0, 20)}...` : productName}
+          {product.productName.length > 20
+            ? `${product.productName.slice(0, 20)}...`
+            : product.productName}
         </li>
       </ol>
     </nav>
@@ -286,6 +289,7 @@ function ReviewsList({ reviews }: { reviews: Review[] }) {
 }
 
 export default function InfoAdicional({ product }: InfoAdicionalProps) {
+  // Usamos un fallback para reviews: si product.reviews es undefined, se toma un array vacío.
   const [reviews, setReviews] = useState<Review[]>(product.reviews || []);
   const handleNewReview = (newReview: Review) => {
     setReviews((prev) => [newReview, ...prev]);
