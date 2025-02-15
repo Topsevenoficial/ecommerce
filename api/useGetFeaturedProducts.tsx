@@ -6,7 +6,7 @@ import { ProductType } from "@/types/product";
  * de nuestro backend Strapi.
  *
  * - Lee la URL base de tu archivo .env:
- *   NEXT_PUBLIC_BACKEND_URL=http://localhost:1337
+ *   NEXT_PUBLIC_BACKEND_URL (ej: https://e-backend-ncui.onrender.com)
  *
  * - Filtra por isFeatured = true y usa `populate=*` para obtener relaciones e imágenes.
  */
@@ -15,7 +15,9 @@ export default function useGetFeaturedProducts() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[isFeatured][$eq]=true&populate=*`;
+  // Elimina la barra final, si existe
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
+  const url = `${baseUrl}/api/products?filters[isFeatured][$eq]=true&populate=*`;
 
   useEffect(() => {
     const fetchData = async () => {

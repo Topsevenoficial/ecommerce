@@ -7,21 +7,17 @@ import { ProductType } from "@/types/product";
  * Hook personalizado para obtener todos los productos con active = true
  * de nuestro backend Strapi.
  *
- * - Revisa tu .env para que NEXT_PUBLIC_BACKEND_URL = http://localhost:1337
- *   (o tu dominio de Strapi en producción).
- * - Filtra por active=true y usa populate=* para traer las relaciones
- *   (imágenes, variantes, etc.).
- *
- * Esta función retorna un arreglo "crudo" de Strapi (jsonData.data),
- * pero tipado como ProductType[] para mayor comodidad.
+ * - Revisa tu .env para que NEXT_PUBLIC_BACKEND_URL esté definido correctamente.
+ * - Filtra por active=true y usa populate=* para traer las relaciones (imágenes, variantes, etc.).
  */
 export default function useGetInStockProducts() {
   const [result, setResult] = useState<ProductType[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Filtramos para active = true.
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[active][$eq]=true&populate=*`;
+  // Elimina la barra final de la URL base, si existe
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
+  const url = `${baseUrl}/api/products?filters[active][$eq]=true&populate=*`;
 
   useEffect(() => {
     const fetchData = async () => {
