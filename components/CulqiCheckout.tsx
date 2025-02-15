@@ -245,7 +245,7 @@ const CulqiCheckout: React.FC<Props> = ({
             cuotealo: true,
           },
           style: {
-            logo: "/images/mini-logo.png", // Ruta correcta
+            logo: "https://res.cloudinary.com/duadc1ckw/image/upload/v1739650688/Icono_512_x_512_copia_3fd0741d95.png", // Ruta correcta
             bannerColor: "#000000",
             buttonBackground: "#007bff",
             menuColor: "#000000",
