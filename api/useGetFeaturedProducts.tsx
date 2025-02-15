@@ -22,11 +22,9 @@ export default function useGetFeaturedProducts() {
     const fetchData = async () => {
       try {
         const response = await fetch(url);
-
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
         }
-
         const jsonData = await response.json();
         // Strapi v4 con REST: el array de productos está en jsonData.data
         setResult(jsonData.data);

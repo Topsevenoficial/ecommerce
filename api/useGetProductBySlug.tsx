@@ -1,5 +1,3 @@
-// D:\Proyecto Ecommerce NextJS\frontend-ecommerce\api\useGetProductBySlug.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -28,11 +26,9 @@ export default function useGetProductBySlug(slug: string) {
     const fetchData = async () => {
       try {
         const response = await fetch(url);
-
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
         }
-
         const jsonData = await response.json();
 
         // Verificamos si se ha obtenido al menos un producto

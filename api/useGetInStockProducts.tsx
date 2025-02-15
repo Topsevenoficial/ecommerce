@@ -1,5 +1,3 @@
-// D:\Proyecto Ecommerce NextJS\frontend-ecommerce\api\useGetInStockProducts.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -22,18 +20,17 @@ export default function useGetInStockProducts() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Filtramos para active = true, sin importar isFeatured
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[$and][0][active][$eq]=true&populate=*`;
+  // Filtramos para active = true.
+  // Nota: Si necesitas usar el filtro con `$and`, puedes volver a la versión anterior.
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[active][$eq]=true&populate=*`;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(url);
-
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
         }
-
         const jsonData = await response.json();
         // Strapi v4 con REST: el array de productos está en jsonData.data
         setResult(jsonData.data);
