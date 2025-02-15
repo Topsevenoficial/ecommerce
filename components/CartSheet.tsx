@@ -33,6 +33,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { getStrapiMedia } from "@/lib/media";
 
 export function CartSheet() {
   const pathname = usePathname();
@@ -93,7 +94,7 @@ export function CartSheet() {
                       <Image
                         src={
                           item.images && item.images[0]?.url
-                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${item.images[0].url}`
+                            ? getStrapiMedia(item.images[0].url)
                             : "/placeholder.png"
                         }
                         alt={item.productName}

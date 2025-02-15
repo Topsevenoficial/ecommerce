@@ -14,8 +14,7 @@ import {
   CreditCard,
   Smartphone,
   Banknote,
-  Percent
-  // Se eliminó DollarSign ya que no se usa.
+  Percent,
 } from "lucide-react";
 import {
   Tooltip,
@@ -28,6 +27,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { getStrapiMedia } from "@/lib/media";
 
 interface CartItem {
   id: string;
@@ -64,12 +64,6 @@ interface OrderSummaryProps {
   customerData: CustomerData;
 }
 
-/**
- * PaymentMethodsList
- *
- * Muestra los métodos de pago (excluyendo "Efectivo") en una cuadrícula de 4 columnas,
- * aplicando colores diferenciados para light y dark mode.
- */
 const PaymentMethodsList: React.FC = () => {
   const paymentMethods = [
     {
@@ -206,9 +200,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           <p className="text-sm text-muted-foreground">Tu carrito está vacío.</p>
         ) : (
           items.map((item) => {
-            const finalPrice = item.discount
-              ? item.price - item.discount
-              : item.price;
+            const finalPrice = item.discount ? item.price - item.discount : item.price;
             return (
               <Card
                 key={item.id}
@@ -219,11 +211,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                     <Image
                       src={
                         item.images && item.images[0]?.url
-                          ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${item.images[0].url}`
+                          ? getStrapiMedia(item.images[0].url)
                           : "/placeholder.png"
                       }
                       alt={item.productName}
                       fill
+                      sizes="100vw"
                       className="object-cover rounded-md"
                     />
                   </div>
@@ -287,7 +280,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
       {/* Botones de acción */}
       <div className="flex flex-col gap-4 mt-6">
-        {/* Botón principal: Proceder al pago */}
         <Button
           type="submit"
           className="w-full py-4 text-xl font-bold bg-emerald-600 dark:bg-emerald-500 text-white shadow-lg transition-transform duration-300 ease-in-out hover:scale-105"
@@ -298,7 +290,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             <ArrowRight className="w-6 h-6 transition-transform duration-300" />
           </span>
         </Button>
-        {/* Botón de soporte */}
         <Button asChild variant="outline" className="w-full py-3 text-lg">
           <a
             href="https://wa.me/51984670999?text=Necesito%20ayuda%20con%20mi%20compra"

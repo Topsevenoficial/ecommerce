@@ -5,9 +5,10 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { ChevronUp, ChevronDown } from "lucide-react"; // Flechas necesarias para escritorio
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { ProductType } from "@/types/product";
 import Image from "next/image";
+import { getStrapiMedia } from "@/lib/media";
 
 // Hook para detectar pantalla móvil
 const useIsMobile = () => {
@@ -17,7 +18,6 @@ const useIsMobile = () => {
     const checkIsMobile = () => setIsMobile(window.innerWidth <= 768);
     checkIsMobile();
     window.addEventListener("resize", checkIsMobile);
-
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
@@ -35,11 +35,11 @@ export function CarouselVertical({
   currentIndex,
   onChange,
 }: CarouselVerticalProps) {
+  // Mapeamos las imágenes usando el helper getStrapiMedia.
   const images =
     product?.images?.map((image) => {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:1337";
-      return `${baseUrl}${image.formats?.medium?.url || image.url}`;
+      const url = image.formats?.medium?.url || image.url;
+      return getStrapiMedia(url);
     }) || [];
 
   const [api, setApi] = React.useState<CarouselApi | null>(null);
@@ -48,9 +48,7 @@ export function CarouselVertical({
   // Actualizamos el índice al seleccionar en el carrusel
   React.useEffect(() => {
     if (!api) return;
-
     api.scrollTo(currentIndex); // Sincroniza con el índice recibido
-
     api.on("select", () => {
       const newIndex = api.selectedScrollSnap();
       onChange(newIndex); // Actualiza el índice en el padre
@@ -67,12 +65,10 @@ export function CarouselVertical({
 
   return (
     <Carousel
-      opts={{
-        align: "start",
-      }}
+      opts={{ align: "start" }}
       orientation={isMobile ? "horizontal" : "vertical"}
       setApi={setApi}
-      className={`${isMobile ? "w-full max-w-full" : "w-[120px] max-w-[120px]"}`}
+      className={isMobile ? "w-full max-w-full" : "w-[120px] max-w-[120px]"}
     >
       {/* Flecha Superior (visible solo en escritorio) */}
       {!isMobile && (
@@ -85,20 +81,18 @@ export function CarouselVertical({
       )}
 
       <CarouselContent
-        className={`flex ${isMobile ? "flex-row" : "flex-col"} ${
+        className={`flex ${isMobile ? "flex-row flex-nowrap" : "flex-col"} ${
           isMobile ? "h-[140px]" : "h-[480px]"
         }`}
-        style={{
-          overflow: "visible", // El contenedor no debe ocultar contenido
-        }}
+        style={{ overflow: "visible" }}
       >
         {images.map((imageUrl, index) => (
           <CarouselItem
             key={index}
-            className={`flex-shrink-0 ${isMobile ? "w-[25%]" : "h-[25%]"} px-2`}
+            className={`flex-shrink-0 ${isMobile ? "w-[120px]" : "h-[25%]"} px-2`}
             style={{
-              flex: "0 0 calc(100% / 4)",
-              maxHeight: isMobile ? "120px" : "120px",
+              flex: isMobile ? "0 0 auto" : "0 0 calc(100% / 4)",
+              maxHeight: "120px",
               marginBottom: "4px",
             }}
             onClick={() => {
@@ -110,14 +104,13 @@ export function CarouselVertical({
               className={`relative w-full aspect-square rounded-md overflow-hidden border ${
                 currentIndex === index ? "ring-2 ring-primary" : ""
               }`}
-              style={{
-                margin: "4px",
-              }}
+              style={{ margin: "4px" }}
             >
               <Image
                 src={imageUrl}
                 alt={`Imagen ${index + 1}`}
                 fill
+                sizes="100vw"
                 className="object-cover w-full h-full cursor-pointer"
               />
             </div>

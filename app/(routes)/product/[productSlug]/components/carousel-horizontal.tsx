@@ -12,6 +12,7 @@ import { ProductType } from "@/types/product";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
+import { getStrapiMedia } from "@/lib/media";
 
 interface CarouselHorizontalProps {
   product: ProductType;
@@ -24,12 +25,12 @@ export function CarouselHorizontal({
   currentIndex,
   onChange,
 }: CarouselHorizontalProps) {
-  // Mapeamos las imágenes del producto
+  // Mapeamos las imágenes del producto usando el helper getStrapiMedia.
   const images =
     product?.images?.map((image) => {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:1337";
-      return `${baseUrl}${image.formats?.medium?.url || image.url}`;
+      // Se utiliza el formato "medium" si existe; de lo contrario, la URL original.
+      const imagePath = image.formats?.medium?.url || image.url;
+      return getStrapiMedia(imagePath);
     }) || [];
 
   const [api, setApi] = React.useState<CarouselApi | null>(null);
@@ -57,10 +58,9 @@ export function CarouselHorizontal({
 
   React.useEffect(() => {
     if (!api) return;
-    // Cuando tengamos la instancia de Embla, nos desplazamos a currentIndex
+    // Cuando tengamos la instancia de Embla, nos desplazamos al índice actual.
     api.scrollTo(currentIndex);
-
-    // Al cambiar el slide en el carrusel principal, llamamos a onChange
+    // Al cambiar el slide en el carrusel, se actualiza el índice en el padre.
     api.on("select", () => {
       const newIndex = api.selectedScrollSnap();
       onChange(newIndex);
@@ -90,25 +90,22 @@ export function CarouselHorizontal({
         y: e.clientY - position.y,
       });
     } else {
-      // Inicia swipe de cambio de imagen si no está haciendo zoom
       setSwipeStartX(e.clientX);
     }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (dragging && isZoomed) {
-      const imageContainer = e.currentTarget.getBoundingClientRect();
-      const maxOffsetX = (imageContainer.width / 2) * (zoomScale - 1);
-      const maxOffsetY = (imageContainer.height / 2) * (zoomScale - 1);
+      const container = e.currentTarget.getBoundingClientRect();
+      const maxOffsetX = (container.width / 2) * (zoomScale - 1);
+      const maxOffsetY = (container.height / 2) * (zoomScale - 1);
       const newX = e.clientX - startPosition.x;
       const newY = e.clientY - startPosition.y;
-
       setPosition({
         x: Math.max(-maxOffsetX, Math.min(maxOffsetX, newX)),
         y: Math.max(-maxOffsetY, Math.min(maxOffsetY, newY)),
       });
     } else if (swipeStartX !== null) {
-      // Calcula el delta para swipe con mouse
       const delta = e.clientX - swipeStartX;
       setSwipeDelta(delta);
     }
@@ -118,7 +115,6 @@ export function CarouselHorizontal({
     if (dragging) {
       setDragging(false);
     } else if (swipeStartX !== null) {
-      // Procesa el swipe en popup
       if (swipeDelta > SWIPE_THRESHOLD) {
         goToPreviousImage();
       } else if (swipeDelta < -SWIPE_THRESHOLD) {
@@ -135,11 +131,8 @@ export function CarouselHorizontal({
       setSwipeStartX(e.touches[0].clientX);
     }
     if (e.touches.length === 2) {
-      const [touch1, touch2] = [e.touches[0], e.touches[1]];
-      const distance = Math.hypot(
-        touch2.pageX - touch1.pageX,
-        touch2.pageY - touch1.pageY
-      );
+      const [t1, t2] = [e.touches[0], e.touches[1]];
+      const distance = Math.hypot(t2.pageX - t1.pageX, t2.pageY - t1.pageY);
       setInitialDistance(distance);
     }
   };
@@ -150,11 +143,8 @@ export function CarouselHorizontal({
       setSwipeDelta(delta);
     }
     if (e.touches.length === 2 && initialDistance !== null) {
-      const [touch1, touch2] = [e.touches[0], e.touches[1]];
-      const currentDistance = Math.hypot(
-        touch2.pageX - touch1.pageX,
-        touch2.pageY - touch1.pageY
-      );
+      const [t1, t2] = [e.touches[0], e.touches[1]];
+      const currentDistance = Math.hypot(t2.pageX - t1.pageX, t2.pageY - t1.pageY);
       const newScale = currentDistance / initialDistance;
       setZoomScale(newScale);
       setIsZoomed(newScale > 1);
@@ -174,7 +164,6 @@ export function CarouselHorizontal({
     setInitialDistance(null);
   };
 
-  // Funciones para cambiar de imagen en el popup
   const goToPreviousImage = () => {
     setSlideDirection("left");
     if (currentIndex > 0) {
@@ -205,13 +194,11 @@ export function CarouselHorizontal({
     );
   }
 
-  // Barra de progreso
-  const progressValue =
-    images.length > 1 ? (currentIndex / (images.length - 1)) * 100 : 100;
+  const progressValue = images.length > 1 ? (currentIndex / (images.length - 1)) * 100 : 100;
 
   return (
     <>
-      {/* Carrusel principal (shadcn) */}
+      {/* Carrusel principal */}
       <div className="mx-auto max-w-lg select-none relative">
         <Carousel
           setApi={setApi}
@@ -222,7 +209,7 @@ export function CarouselHorizontal({
             {images.map((imageUrl, index) => (
               <CarouselItem key={index} className="cursor-pointer">
                 <div className="relative w-full aspect-square rounded-md overflow-hidden">
-                  {/* Badges en la esquina superior izquierda de cada imagen */}
+                  {/* Badges en la esquina superior izquierda */}
                   <div className="absolute top-2 left-2 z-20 flex flex-row-reverse items-center gap-2">
                     {product.UV400 && (
                       <Badge>
@@ -230,7 +217,6 @@ export function CarouselHorizontal({
                         UV400
                       </Badge>
                     )}
-
                     {product.polarizado && (
                       <Badge>
                         <Check className="w-3 h-3" />
@@ -238,12 +224,12 @@ export function CarouselHorizontal({
                       </Badge>
                     )}
                   </div>
-
                   <div className="relative w-full h-full">
                     <Image
                       src={imageUrl}
                       alt={`Imagen ${index + 1}`}
                       fill
+                      sizes="100vw"
                       className="object-cover"
                       onClick={() => setShowPopup(true)}
                       style={{ cursor: "zoom-in" }}
@@ -258,19 +244,16 @@ export function CarouselHorizontal({
           <CarouselPrevious className="hidden md:flex justify-center items-center cursor-pointer bg-white/50 dark:bg-gray-800/50 p-1 rounded-full shadow absolute left-2 top-1/2 -translate-y-1/2 z-10 hover:bg-white/60 dark:hover:bg-gray-700/60">
             <ChevronLeft className="w-4 h-4 text-gray-700 dark:text-gray-200" />
           </CarouselPrevious>
-
           <CarouselNext className="hidden md:flex justify-center items-center cursor-pointer bg-white/50 dark:bg-gray-800/50 p-1 rounded-full shadow absolute right-2 top-1/2 -translate-y-1/2 z-10 hover:bg-white/60 dark:hover:bg-gray-700/60">
             <ChevronRight className="w-4 h-4 text-gray-700 dark:text-gray-200" />
           </CarouselNext>
         </Carousel>
-
-        {/* Barra de progreso */}
         <div className="py-2">
           <Progress value={progressValue} className="w-[60%] mx-auto" />
         </div>
       </div>
 
-      {/* Popup para ver imágenes a mayor tamaño */}
+      {/* Popup para imagen ampliada */}
       {showPopup && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4 sm:p-8"
@@ -298,8 +281,6 @@ export function CarouselHorizontal({
             >
               ✕
             </button>
-
-            {/* Flechas laterales del popup */}
             <div
               className="flex justify-center items-center cursor-pointer bg-black/40 p-1 rounded-full shadow absolute left-2 top-1/2 -translate-y-1/2 z-10 hover:bg-black/50"
               onClick={goToPreviousImage}
@@ -312,8 +293,6 @@ export function CarouselHorizontal({
             >
               <ChevronRight className="w-4 h-4 text-white" />
             </div>
-
-            {/* Imagen ampliada con animación de slide */}
             <div
               className={`relative ${isZoomed ? "cursor-grab" : "cursor-zoom-in"} transition-transform duration-300 ${
                 slideDirection === "left"
@@ -331,6 +310,7 @@ export function CarouselHorizontal({
                 src={images[currentIndex]}
                 alt={`Imagen ${currentIndex + 1}`}
                 draggable={false}
+                sizes="100vw"
                 className="object-contain w-full h-auto max-h-screen"
                 style={{
                   transform: isZoomed

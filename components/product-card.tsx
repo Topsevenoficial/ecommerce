@@ -10,7 +10,7 @@ import { Badge } from "./ui/badge";
 import { useCart } from "@/hooks/use-cart";
 import { useCartSheet } from "@/hooks/use-cart-sheet";
 import { Button } from "@/components/ui/button";
-
+import { getStrapiMedia } from "@/lib/media";
 
 interface IconLabelProps {
   icon: React.ReactElement;
@@ -67,8 +67,9 @@ export function ProductCard({ product, badge }: ProductCardProps) {
     setImageIndex(0);
   };
 
+  // Usamos el helper para obtener la URL correcta, ya sea desde Cloudinary o el backend.
   const currentImageUrl = images?.[imageIndex]?.url
-    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${images[imageIndex].url}`
+    ? getStrapiMedia(images[imageIndex].url)
     : "/placeholder.png";
 
   let baseName = productName;
@@ -104,8 +105,7 @@ export function ProductCard({ product, badge }: ProductCardProps) {
           </Badge>
         )}
 
-        {/* 2. Renderizamos `badge` (si llega). 
-            Ten cuidado con la posición (clases) para no superponerse a "Destacado". */}
+        {/* Renderizamos `badge` (si llega) */}
         {badge}
 
         {/* Overlay "AGOTADO" si el producto no está activo */}
@@ -172,9 +172,7 @@ export function ProductCard({ product, badge }: ProductCardProps) {
           </h3>
           {category && (
             <IconLabel
-              icon={
-                <ShoppingBag size={16} className="text-accent-foreground" />
-              }
+              icon={<ShoppingBag size={16} className="text-accent-foreground" />}
               label={category.categoryName}
             />
           )}
