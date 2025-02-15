@@ -15,7 +15,6 @@ export default function useGetFeaturedProducts() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Filtramos para isFeatured = true.
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[isFeatured][$eq]=true&populate=*`;
 
   useEffect(() => {
@@ -28,8 +27,12 @@ export default function useGetFeaturedProducts() {
         const jsonData = await response.json();
         // Strapi v4 con REST: el array de productos está en jsonData.data
         setResult(jsonData.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err);
+        } else {
+          setError(new Error("Ocurrió un error inesperado"));
+        }
       } finally {
         setLoading(false);
       }
@@ -40,7 +43,7 @@ export default function useGetFeaturedProducts() {
 
   return {
     loading,
-    result, // Array de ProductType o null
+    result,
     error,
   };
 }

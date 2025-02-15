@@ -19,7 +19,6 @@ export default function useGetProductBySlug(slug: string) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Construimos la URL con el filtro por slug y populate todas las relaciones
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[slug][$eq]=${slug}&populate=*`;
 
   useEffect(() => {
@@ -31,20 +30,22 @@ export default function useGetProductBySlug(slug: string) {
         }
         const jsonData = await response.json();
 
-        // Verificamos si se ha obtenido al menos un producto
         if (jsonData.data && jsonData.data.length > 0) {
-          setResult(jsonData.data[0]); // Tomamos el primer (y único) producto
+          setResult(jsonData.data[0]);
         } else {
-          setResult(null); // No se encontró el producto
+          setResult(null);
         }
-      } catch (err: any) {
-        setError(err);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err);
+        } else {
+          setError(new Error("Ocurrió un error inesperado"));
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    // Solo realizamos la solicitud si el slug no está vacío
     if (slug) {
       fetchData();
     } else {
@@ -55,7 +56,7 @@ export default function useGetProductBySlug(slug: string) {
 
   return {
     loading,
-    result, // Producto obtenido o null
+    result,
     error,
   };
 }
