@@ -4,10 +4,9 @@ interface PageParams {
   productSlug: string;
 }
 
-export default async function Page({ params }: { params: unknown }) {
-  // Convertimos 'params' a nuestro tipo esperado
-  const awaitedParams = (await params) as PageParams;
-  const { productSlug } = awaitedParams;
+export default async function Page({ params }: { params: Promise<PageParams> }) {
+  // Awaitamos params porque Next.js lo provee como un valor perezoso (lazy)
+  const { productSlug } = await params;
 
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
   const url = `${baseUrl}/api/products?filters[slug][$eq]=${productSlug}&populate=*`;
