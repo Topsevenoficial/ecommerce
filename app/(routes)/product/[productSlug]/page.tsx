@@ -1,10 +1,12 @@
 import ProductDetail from "./product-detail";
 
-export default async function Page({ 
-  params 
-}: { params: { productSlug: string } | Promise<{ productSlug: string }> }) {
-  // Si params es una promesa, await lo resolverá; si no, devolverá el mismo objeto.
-  const awaitedParams = await params;
+interface PageParams {
+  productSlug: string;
+}
+
+export default async function Page({ params }: { params: unknown }) {
+  // Convertimos 'params' a nuestro tipo esperado
+  const awaitedParams = (await params) as PageParams;
   const { productSlug } = awaitedParams;
 
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
