@@ -2,7 +2,10 @@
 
 import React, { useMemo } from "react";
 import { ProductType } from "@/types/product";
+
+// Markdown
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // Componentes ShadCN
 import { Badge } from "@/components/ui/badge";
@@ -202,6 +205,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           </div>
         </div>
 
+        {/* Botón que abre el sheet de especificaciones */}
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -239,6 +243,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                 </TabsTrigger>
               </TabsList>
 
+              {/* Pestaña: Materiales */}
               <TabsContent value="details" className="pt-4 sm:pt-6">
                 <Accordion
                   type="single"
@@ -380,10 +385,13 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                 </Accordion>
               </TabsContent>
 
+              {/* Pestaña: Medidas */}
               <TabsContent value="measurements" className="pt-4 sm:pt-6">
                 <div className="prose prose-sm dark:prose-invert max-w-none">
                   {product.medidas ? (
-                    <ReactMarkdown>{product.medidas}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {product.medidas}
+                    </ReactMarkdown>
                   ) : (
                     <p className="text-muted-foreground text-center py-4 sm:py-8">
                       No hay medidas disponibles para este producto

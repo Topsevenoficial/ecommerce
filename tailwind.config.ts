@@ -3,7 +3,14 @@ const { fontFamily } = require("tailwindcss/defaultTheme");
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  content: ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
+  // Asegúrate de incluir las rutas donde usas clases de Tailwind (incluyendo .js, .jsx si las usas)
+  content: [
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    // Agrega otras rutas si es necesario:
+    // "app/**/*.{js,jsx}",
+    // "components/**/*.{js,jsx}"
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -62,28 +69,16 @@ module.exports = {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
         "caret-blink": {
-          "0%,70%,100%": {
-            opacity: "1",
-          },
-          "20%,50%": {
-            opacity: "0",
-          },
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
         },
       },
       animation: {
@@ -93,5 +88,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
