@@ -24,7 +24,14 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     <div className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6">
       {/* Sección superior con carruseles y datos del producto */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 sm:gap-6">
-        <div className="sm:col-span-8 lg:col-span-7 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
+        {/* Contenedor de ambos carruseles */}
+        <div
+          className="sm:col-span-8 lg:col-span-7 flex flex-col sm:flex-row 
+                        items-center sm:items-start 
+                        justify-center sm:justify-start
+                        gap-4 sm:gap-6"
+        >
+          {/* Carrusel Horizontal (abajo en móvil, derecha en escritorio) */}
           <div className="order-1 sm:order-2 w-full max-w-lg">
             <CarouselHorizontal
               product={product}
@@ -32,14 +39,21 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               onChange={setCurrentIndex}
             />
           </div>
-          <div className="order-2 sm:order-1 flex-shrink-0 w-full max-w-lg sm:max-w-none">
-  <CarouselVertical
-    product={product}
-    currentIndex={currentIndex}
-    onChange={setCurrentIndex}
-  />
-</div>
+
+          {/* Carrusel Vertical (arriba en móvil, izquierda en escritorio) */}
+          <div
+            className="order-2 sm:order-1 flex-shrink-0 
+                          w-full sm:w-auto"
+          >
+            <CarouselVertical
+              product={product}
+              currentIndex={currentIndex}
+              onChange={setCurrentIndex}
+            />
+          </div>
         </div>
+
+        {/* Info del producto a la derecha en escritorio */}
         <div className="sm:col-span-4 lg:col-span-5 order-3">
           <ProductInfo product={product} />
         </div>
@@ -67,9 +81,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
-            <AccordionTrigger>
-              ¿Cuánto tiempo tarda el envío?
-            </AccordionTrigger>
+            <AccordionTrigger>¿Cuánto tiempo tarda el envío?</AccordionTrigger>
             <AccordionContent>
               Los envíos se realizan a través de Shalom y tienen un plazo de
               entrega de 2 a 5 días hábiles, dependiendo de la distancia desde
