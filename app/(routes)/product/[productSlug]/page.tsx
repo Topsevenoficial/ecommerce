@@ -4,11 +4,13 @@ interface PageParams {
   productSlug: string;
 }
 
-export default async function Page({ params }: { params: Promise<PageParams> }) {
-  // Awaitamos params porque Next.js lo provee como un valor perezoso (lazy)
-  const { productSlug } = await params;
+export default async function Page({ params }: { params: PageParams }) {
+  const { productSlug } = params; // ya es un objeto, no es necesario await
 
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
+  }
   const url = `${baseUrl}/api/products?filters[slug][$eq]=${productSlug}&populate=*`;
 
   // Se cachea la respuesta durante 60 segundos
