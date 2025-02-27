@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import {
   Popover,
-  PopoverContent,
   PopoverTrigger,
+  PopoverContent,
+  PopoverClose, // Importa el nuevo componente
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -64,18 +65,22 @@ export function MenuList() {
           </PopoverTrigger>
           <PopoverContent className="w-screen max-w-[240px] p-4">
             <div className="flex flex-col gap-3">
-              <Link
-                href="/"
-                className="text-sm font-medium px-2 py-1 rounded-md hover:bg-accent"
-              >
-                Catálogo
-              </Link>
-              <Link
-                href="/whatsapp"
-                className="text-sm font-medium px-2 py-1 rounded-md hover:bg-accent"
-              >
-                Contacto
-              </Link>
+              <PopoverClose asChild>
+                <Link
+                  href="/"
+                  className="text-sm font-medium px-2 py-1 rounded-md hover:bg-accent"
+                >
+                  Catálogo
+                </Link>
+              </PopoverClose>
+              <PopoverClose asChild>
+                <Link
+                  href="/whatsapp"
+                  className="text-sm font-medium px-2 py-1 rounded-md hover:bg-accent"
+                >
+                  Contacto
+                </Link>
+              </PopoverClose>
             </div>
           </PopoverContent>
         </Popover>

@@ -11,6 +11,7 @@ export default async function Page({ params }: { params: Promise<PageParams> }) 
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
   const url = `${baseUrl}/api/products?filters[slug][$eq]=${productSlug}&populate=*`;
 
+  // Se cachea la respuesta durante 60 segundos
   const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) {
     throw new Error(`Error HTTP: ${res.status}`);

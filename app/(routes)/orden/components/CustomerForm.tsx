@@ -229,17 +229,21 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                     pattern="[0-9]*"
                   />
                   <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-                    <TooltipTrigger asChild>
-                      <span className="cursor-pointer">
-                        <Info className="w-4 h-4 text-muted-foreground" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent className="p-2">
-                      <p className="text-xs">
-                        Para registrar el envío y generar la boleta.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
+  <TooltipTrigger asChild>
+    <span
+      className="cursor-pointer"
+      onClick={() => setTooltipOpen((prev) => !prev)}
+    >
+      <Info className="w-4 h-4 text-muted-foreground" />
+    </span>
+  </TooltipTrigger>
+  <TooltipContent className="p-2">
+    <p className="text-xs">
+      Para registrar el envío y generar la boleta.
+    </p>
+  </TooltipContent>
+</Tooltip>
+
                 </div>
               </div>
             </div>
@@ -288,18 +292,22 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   inputMode="numeric"
                   pattern="[0-9]*"
                 />
-                <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-                  <TooltipTrigger asChild>
-                    <span className="cursor-pointer">
-                      <Info className="w-4 h-4 text-muted-foreground" />
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent className="p-2">
-                    <p className="text-xs">
-                      Para registrar el envío y generar la boleta.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+               <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+  <TooltipTrigger asChild>
+    <span
+      className="cursor-pointer"
+      onClick={() => setTooltipOpen((prev) => !prev)}
+    >
+      <Info className="w-4 h-4 text-muted-foreground" />
+    </span>
+  </TooltipTrigger>
+  <TooltipContent className="p-2">
+    <p className="text-xs">
+      Para registrar el envío y generar la boleta.
+    </p>
+  </TooltipContent>
+</Tooltip>
+
               </div>
             </div>
           </div>

@@ -28,7 +28,7 @@ export interface OrderItemLocal {
 import { OrderData } from "@/types/order";
 
 interface Props {
-  order?: string;
+  order: string; // Asegúrate de pasar un Order ID válido
   customerData: CustomerData;
   shippingMethod: "shalom" | "olva";
   orderItems: OrderItem[];
@@ -56,7 +56,7 @@ const CulqiCheckout: React.FC<Props> = ({
   const [checkoutOpened, setCheckoutOpened] = useState(false);
   const [hasOpenedOnce, setHasOpenedOnce] = useState(false);
 
-  // Definimos sendTokenToBackend con useCallback para estabilizar su identidad
+  // Función para enviar el token al backend
   const sendTokenToBackend = useCallback(
     async (token: string) => {
       try {
@@ -102,7 +102,7 @@ const CulqiCheckout: React.FC<Props> = ({
 
         const { payment, orden } = data.data;
 
-        // Mapeamos la respuesta al type OrderData (asegurándonos de tener la estructura correcta)
+        // Mapeamos la respuesta al type OrderData
         const orderDataConverted: OrderData = {
           id: orden.id,
           customer_first_name: payment.first_name,
@@ -114,11 +114,11 @@ const CulqiCheckout: React.FC<Props> = ({
           address_city: payment.address_city,
           country_code: payment.country_code,
           metodo_envio: orden.metodo_envio,
-          order_items: orden.order_items, // Se espera que cumpla con el type OrderItem[]
+          order_items: orden.order_items,
           subtotal: orden.subtotal / 100,
           shipping_cost: orden.shipping_cost / 100,
           total: orden.total / 100,
-          order_status: orden.order_status || "pendiente", // Asigna un valor por defecto si es necesario
+          order_status: orden.order_status || "pendiente",
           createdAt: orden.createdAt,
           updatedAt: orden.updatedAt,
           publishedAt: orden.publishedAt,
@@ -160,7 +160,7 @@ const CulqiCheckout: React.FC<Props> = ({
         title: "TopSeven Tienda Online",
         currency: "PEN",
         amount: totalCentavos,
-        order: order || "",
+        order: order, // Se envía el Order ID válido
         ...(process.env.NEXT_PUBLIC_ENVIRONMENT === "production" && {
           xculqirsaid: process.env.NEXT_PUBLIC_CULQI_XCULQIRSAID,
           rsapublickey: process.env.NEXT_PUBLIC_CULQI_RSA_PUBLIC_KEY,
@@ -179,7 +179,7 @@ const CulqiCheckout: React.FC<Props> = ({
           cuotealo: true,
         },
         style: {
-          logo: "/images/mini-logo.png", // Ruta correcta
+          logo: "/images/mini-logo.png",
           bannerColor: "#000000",
           buttonBackground: "#007bff",
           menuColor: "#000000",
@@ -226,7 +226,7 @@ const CulqiCheckout: React.FC<Props> = ({
           title: "TopSeven Tienda Online",
           currency: "PEN",
           amount: totalCentavos,
-          order: order || "",
+          order: order, // Se envía el Order ID válido
           ...(process.env.NEXT_PUBLIC_ENVIRONMENT === "production" && {
             xculqirsaid: process.env.NEXT_PUBLIC_CULQI_XCULQIRSAID,
             rsapublickey: process.env.NEXT_PUBLIC_CULQI_RSA_PUBLIC_KEY,
@@ -245,7 +245,7 @@ const CulqiCheckout: React.FC<Props> = ({
             cuotealo: true,
           },
           style: {
-            logo: "https://res.cloudinary.com/duadc1ckw/image/upload/v1739650688/Icono_512_x_512_copia_3fd0741d95.png", // Ruta correcta
+            logo: "https://res.cloudinary.com/duadc1ckw/image/upload/v1739650688/Icono_512_x_512_copia_3fd0741d95.png",
             bannerColor: "#000000",
             buttonBackground: "#007bff",
             menuColor: "#000000",

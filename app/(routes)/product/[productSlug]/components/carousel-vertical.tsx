@@ -4,13 +4,14 @@ import {
   CarouselContent,
   CarouselItem,
   type CarouselApi,
+  CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { ProductType } from "@/types/product";
 import Image from "next/image";
 import { getStrapiMedia } from "@/lib/media";
 
-// Hook para detectar pantalla móvil
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = React.useState(false);
 
@@ -25,9 +26,9 @@ const useIsMobile = () => {
 };
 
 interface CarouselVerticalProps {
-  product: ProductType; // Se espera que siempre haya un producto
-  currentIndex: number; // Índice actual sincronizado
-  onChange: (index: number) => void; // Callback para sincronización
+  product: ProductType;
+  currentIndex: number;
+  onChange: (index: number) => void;
 }
 
 export function CarouselVertical({
@@ -35,7 +36,6 @@ export function CarouselVertical({
   currentIndex,
   onChange,
 }: CarouselVerticalProps) {
-  // Mapeamos las imágenes usando el helper getStrapiMedia.
   const images =
     product?.images?.map((image) => {
       const url = image.formats?.medium?.url || image.url;
@@ -45,13 +45,12 @@ export function CarouselVertical({
   const [api, setApi] = React.useState<CarouselApi | null>(null);
   const isMobile = useIsMobile();
 
-  // Actualizamos el índice al seleccionar en el carrusel
   React.useEffect(() => {
     if (!api) return;
-    api.scrollTo(currentIndex); // Sincroniza con el índice recibido
+    api.scrollTo(currentIndex);
     api.on("select", () => {
       const newIndex = api.selectedScrollSnap();
-      onChange(newIndex); // Actualiza el índice en el padre
+      onChange(newIndex);
     });
   }, [api, currentIndex, onChange]);
 
@@ -65,64 +64,71 @@ export function CarouselVertical({
 
   return (
     <Carousel
-      opts={{ align: "start" }}
+      opts={{
+        align: "start",
+        containScroll: "keepSnaps",
+        dragFree: true,
+      }}
       orientation={isMobile ? "horizontal" : "vertical"}
       setApi={setApi}
-      className={isMobile ? "w-full max-w-full" : "w-[120px] max-w-[120px]"}
+      className={isMobile ? "w-full relative" : "w-[120px] relative"}
     >
-      {/* Flecha Superior (visible solo en escritorio) */}
+      {/* Controles para móvil */}
+      {isMobile && (
+        <>
+          <CarouselPrevious className="left-2 h-8 w-8" />
+          <CarouselNext className="right-2 h-8 w-8" />
+        </>
+      )}
+
+      {/* Controles para escritorio */}
       {!isMobile && (
         <div
-          className="flex justify-center items-center cursor-pointer text-gray-500 hover:text-gray-700"
-          onClick={() => api?.scrollTo(currentIndex - 1)}
+          className="absolute top-0 left-1/2 -translate-x-1/2 z-10 cursor-pointer text-gray-500 hover:text-gray-700"
+          onClick={() => api?.scrollPrev()}
         >
           <ChevronUp className="w-6 h-6" />
         </div>
       )}
 
       <CarouselContent
-        className={`flex ${isMobile ? "flex-row flex-nowrap" : "flex-col"} ${
-          isMobile ? "h-[140px]" : "h-[480px]"
-        }`}
-        style={{ overflow: "visible" }}
+        className={
+          isMobile
+            ? "h-[120px] -ml-0"
+            : "h-[480px] -mt-0"
+        }
       >
         {images.map((imageUrl, index) => (
           <CarouselItem
             key={index}
-            className={`flex-shrink-0 ${isMobile ? "w-[120px]" : "h-[25%]"} px-2`}
-            style={{
-              flex: isMobile ? "0 0 auto" : "0 0 calc(100% / 4)",
-              maxHeight: "120px",
-              marginBottom: "4px",
-            }}
+            className={`${isMobile ? "basis-[120px]" : "basis-[25%]"} relative p-1 transition-transform duration-300 transform hover:scale-105`}
             onClick={() => {
               onChange(index);
               api?.scrollTo(index);
             }}
           >
             <div
-              className={`relative w-full aspect-square rounded-md overflow-hidden border ${
-                currentIndex === index ? "ring-2 ring-primary" : ""
+              className={`relative aspect-square rounded-md overflow-hidden border-2 transition-colors duration-300 ${
+                currentIndex === index ? "border-primary shadow-md" : "border-transparent"
               }`}
-              style={{ margin: "4px" }}
             >
               <Image
                 src={imageUrl}
                 alt={`Imagen ${index + 1}`}
                 fill
-                sizes="100vw"
-                className="object-cover w-full h-full cursor-pointer"
+                sizes="(max-width: 768px) 120px, 100px"
+                className="object-cover cursor-pointer"
+                priority={index === 0}
               />
             </div>
           </CarouselItem>
         ))}
       </CarouselContent>
 
-      {/* Flecha Inferior (visible solo en escritorio) */}
       {!isMobile && (
         <div
-          className="flex justify-center items-center cursor-pointer text-gray-500 hover:text-gray-700"
-          onClick={() => api?.scrollTo(currentIndex + 1)}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 cursor-pointer text-gray-500 hover:text-gray-700"
+          onClick={() => api?.scrollNext()}
         >
           <ChevronDown className="w-6 h-6" />
         </div>

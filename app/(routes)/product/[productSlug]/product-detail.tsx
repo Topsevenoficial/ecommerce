@@ -32,13 +32,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               onChange={setCurrentIndex}
             />
           </div>
-          <div className="order-2 sm:order-1 flex-shrink-0">
-            <CarouselVertical
-              product={product}
-              currentIndex={currentIndex}
-              onChange={setCurrentIndex}
-            />
-          </div>
+          <div className="order-2 sm:order-1 flex-shrink-0 w-full max-w-lg sm:max-w-none">
+  <CarouselVertical
+    product={product}
+    currentIndex={currentIndex}
+    onChange={setCurrentIndex}
+  />
+</div>
         </div>
         <div className="sm:col-span-4 lg:col-span-5 order-3">
           <ProductInfo product={product} />
