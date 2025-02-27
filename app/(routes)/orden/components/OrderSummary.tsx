@@ -13,8 +13,6 @@ import {
   HelpCircle,
   CreditCard,
   Smartphone,
-  Banknote,
-  Percent,
 } from "lucide-react";
 import {
   Tooltip,
@@ -73,29 +71,17 @@ const PaymentMethodsList: React.FC = () => {
       textColor: "text-blue-600 dark:text-blue-300",
     },
     {
-      label: "Yape/Billetera",
+      label: "Yape",
       Icon: Smartphone,
       bgColor: "bg-green-100 dark:bg-green-900",
       textColor: "text-green-600 dark:text-green-300",
-    },
-    {
-      label: "Banca Móvil",
-      Icon: Banknote,
-      bgColor: "bg-indigo-100 dark:bg-indigo-900",
-      textColor: "text-indigo-600 dark:text-indigo-300",
-    },
-    {
-      label: "Cuotas BCP",
-      Icon: Percent,
-      bgColor: "bg-red-100 dark:bg-red-900",
-      textColor: "text-red-600 dark:text-red-300",
     },
   ];
 
   return (
     <div className="mt-4">
       <h3 className="text-sm font-semibold mb-2">Medios de Pago</h3>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         {paymentMethods.map(({ label, Icon, bgColor, textColor }, index) => (
           <div
             key={index}

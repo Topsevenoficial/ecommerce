@@ -24,7 +24,6 @@ export interface OrderItemLocal {
   quantity: number;
 }
 
-// Usamos el type OrderData de "@/types/order" para la conversión
 import { OrderData } from "@/types/order";
 
 interface Props {
@@ -173,10 +172,10 @@ const CulqiCheckout: React.FC<Props> = ({
         paymentMethods: {
           tarjeta: true,
           yape: true,
-          bancaMovil: true,
-          agente: true,
-          billetera: true,
-          cuotealo: true,
+          bancaMovil: false,
+          agente: false,
+          billetera: false,
+          cuotealo: false,
         },
         style: {
           logo: "/images/mini-logo.png",
@@ -239,10 +238,10 @@ const CulqiCheckout: React.FC<Props> = ({
           paymentMethods: {
             tarjeta: true,
             yape: true,
-            bancaMovil: true,
-            agente: true,
-            billetera: true,
-            cuotealo: true,
+            bancaMovil: false,
+            agente: false,
+            billetera: false,
+            cuotealo: false,
           },
           style: {
             logo: "https://res.cloudinary.com/duadc1ckw/image/upload/v1739650688/Icono_512_x_512_copia_3fd0741d95.png",
