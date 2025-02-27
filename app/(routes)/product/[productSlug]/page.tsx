@@ -4,8 +4,9 @@ interface PageParams {
   productSlug: string;
 }
 
-export default async function Page({ params }: { params: PageParams }) {
-  const { productSlug } = params; // ya es un objeto, no es necesario await
+export default async function Page({ params }: { params: Promise<PageParams> }) {
+  // Esperamos los parámetros, ya que Next.js los provee de forma perezosa
+  const { productSlug } = await params;
 
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
   if (!baseUrl) {
