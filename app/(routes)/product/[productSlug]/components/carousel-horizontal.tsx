@@ -310,6 +310,8 @@ export function CarouselHorizontal({
                 src={images[currentIndex]}
                 alt={`Imagen ${currentIndex + 1}`}
                 draggable={false}
+                width={800}
+                height={800}
                 sizes="100vw"
                 className="object-contain w-full h-auto max-h-screen"
                 style={{

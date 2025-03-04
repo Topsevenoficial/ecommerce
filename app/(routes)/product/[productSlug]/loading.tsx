@@ -1,7 +1,5 @@
+import { SkeletonProduct } from "./components/skeleton-product";
+
 export default function Loading() {
-  return (
-    <div className="flex justify-center items-center h-screen">
-      <p className="text-lg">Cargando producto...</p>
-    </div>
-  );
+  return <SkeletonProduct />;
 }
