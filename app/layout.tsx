@@ -37,7 +37,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <head>{/* Metatags adicionales si se requieren */}</head>
+      <head>
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9G4V0FEFXE"></script>
+        <script>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-9G4V0FEFXE');
+          `}
+        </script>
+        {/* Metatags adicionales si se requieren */}
+      </head>
       <body className={`${jost.variable} antialiased`}>
         <ThemeWrapper>
           {/* Suspense sigue envolviendo el contenido en caso de componentes con Suspense */}
