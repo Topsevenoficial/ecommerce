@@ -70,21 +70,12 @@ export function useAgencies() {
           console.log("Agencies page " + page, json);
 
           // Mapeamos sin usar `any`:
-          const agencias: Agency[] = json.data.map(
-            (item: ShalomItemFromStrapi) => ({
-              // Convertimos el id a string, ya que `Agency` usa string
-              id: String(item.id),
-              name: item.attributes
-                ? item.attributes.nombre ?? ""
-                : item.nombre ?? "",
-              ubicacion: item.attributes
-                ? item.attributes.ubicacion ?? ""
-                : item.ubicacion ?? "",
-              direction: item.attributes
-                ? item.attributes.direccion ?? ""
-                : item.direccion ?? "",
-            })
-          );
+          const agencias: Agency[] = json.data.map((item: ShalomItemFromStrapi) => ({
+            id: String(item.id),
+            name: item.nombre ?? "", // Use the direct field instead of item.attributes.nombre
+            ubicacion: item.ubicacion ?? "", // Use the direct field instead of item.attributes.ubicacion
+            direction: item.direccion ?? "", // Use the direct field instead of item.attributes.direccion
+          }));
 
           allAgencies = allAgencies.concat(agencias);
           totalPages = json.meta.pagination.pageCount;
