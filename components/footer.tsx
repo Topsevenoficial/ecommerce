@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function Footer() {
   return (
-    <footer className="mt-4 border-t">
+    <footer className="mt-4 border-t bg-muted/50">
       <div className="container mx-auto px-6 py-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
           <div className="space-y-3">
@@ -81,7 +81,7 @@ export function Footer() {
 
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground gap-4">
           <div className="text-center md:text-left">
-            © 2025 TopSeven Oficial - Todos los derechos reservados
+            &copy; 2025 TopSeven Oficial - Todos los derechos reservados
             <br />
             &quot;Protegiendo tu visi&oacute;n con calidad&quot;
           </div>
@@ -92,7 +92,7 @@ export function Footer() {
             <Link href="/politica-privacidad" className="hover:text-primary">
               Privacidad
             </Link>
-            <span>Certificado SSL</span>
+          <Link href="/certificado-ssl" className="hover:text-primary">Certificado SSL</Link>
           </div>
         </div>
       </div>
