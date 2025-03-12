@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { CarouselVertical } from "./components/carousel-vertical";
-import { CarouselHorizontal } from "./components/carousel-horizontal";
+import { CarouselHorizontal } from "./components/carousel-horizontal-enhanced";
 import ProductInfo from "./components/product-info";
 import InfoAdicional from "./components/info-adicional";
 import {

@@ -8,8 +8,9 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ProductType } from "@/types/product";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import { getStrapiMedia } from "@/lib/media";
@@ -44,9 +45,20 @@ export function CarouselHorizontal({
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
   const [dragging, setDragging] = React.useState(false);
   const [startPosition, setStartPosition] = React.useState({ x: 0, y: 0 });
+  
+  // Referencia al contenedor de la imagen para manipulación del DOM
+  const imageContainerRef = React.useRef<HTMLDivElement>(null);
+  
+  // Constantes para configuración de zoom
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 3;
+  const ZOOM_STEP = 0.5;
 
-  // Para pinch-to-zoom en mobile
+  // Estado adicional para pinch-to-zoom en mobile
   const [initialDistance, setInitialDistance] = React.useState<number | null>(null);
+  const [initialScale, setInitialScale] = React.useState(1);
+  // We only set this value, but use midX/midY directly for clarity in the touch handler
+  const [, setInitialPinchPosition] = React.useState({ x: 0, y: 0 });
 
   // Estados para swipe horizontal (cambio de imagen) en popup
   const [swipeStartX, setSwipeStartX] = React.useState<number | null>(null);
@@ -67,21 +79,91 @@ export function CarouselHorizontal({
     });
   }, [api, currentIndex, onChange]);
 
-  // Helpers para el zoom
+  // Función mejorada para resetear el zoom
   const resetZoom = () => {
     setIsZoomed(false);
     setZoomScale(1);
     setPosition({ x: 0, y: 0 });
   };
 
-  const handleZoomToggle = () => {
-    const newZoom = !isZoomed;
-    setIsZoomed(newZoom);
-    setZoomScale(newZoom ? 2 : 1);
-    setPosition({ x: 0, y: 0 });
+  // Función para cambiar el nivel de zoom con punto focal
+  const changeZoomLevel = (newZoomScale: number, centerX?: number, centerY?: number) => {
+    // Limitar el zoom entre MIN_ZOOM y MAX_ZOOM
+    const clampedZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoomScale));
+    
+    // Si estamos en zoom mínimo, resetear todo
+    if (clampedZoom <= MIN_ZOOM) {
+      resetZoom();
+      return;
+    }
+    
+    setIsZoomed(true);
+    
+    // Si se proporciona un punto central (posición del cursor/toque), hacer zoom centrado en ese punto
+    if (centerX !== undefined && centerY !== undefined && imageContainerRef.current) {
+      const container = imageContainerRef.current.getBoundingClientRect();
+      
+      // Calcular la posición relativa del cursor dentro del contenedor de la imagen
+      const relX = centerX - container.left;
+      const relY = centerY - container.top;
+      
+      // Calcular el factor de cambio de escala
+      const prevScale = zoomScale;
+      const scaleChange = clampedZoom / prevScale;
+      
+      // Ajustar la posición para mantener el punto bajo el cursor
+      const containerCenterX = container.width / 2;
+      const containerCenterY = container.height / 2;
+      
+      const distanceFromCenterX = relX - containerCenterX;
+      const distanceFromCenterY = relY - containerCenterY;
+      
+      const newX = position.x - (distanceFromCenterX * (scaleChange - 1));
+      const newY = position.y - (distanceFromCenterY * (scaleChange - 1));
+      
+      // Aplicar límites a la posición
+      const maxOffsetX = (container.width / 2) * (clampedZoom - 1);
+      const maxOffsetY = (container.height / 2) * (clampedZoom - 1);
+      
+      setPosition({
+        x: Math.max(-maxOffsetX, Math.min(maxOffsetX, newX)),
+        y: Math.max(-maxOffsetY, Math.min(maxOffsetY, newY)),
+      });
+    }
+    
+    setZoomScale(clampedZoom);
   };
 
-  // Swipe / arrastre con mouse en el popup
+  // Manejadores para botones de zoom
+  const handleZoomIn = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    changeZoomLevel(zoomScale + ZOOM_STEP);
+  };
+
+  const handleZoomOut = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    changeZoomLevel(zoomScale - ZOOM_STEP);
+  };
+
+  // Función mejorada de toggle de zoom con punto focal
+  const handleZoomToggle = (e: React.MouseEvent<HTMLDivElement>) => {
+    const newZoom = !isZoomed;
+    if (newZoom) {
+      changeZoomLevel(2, e.clientX, e.clientY);
+    } else {
+      resetZoom();
+    }
+  };
+  
+  // Manejar zoom con rueda del ratón
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    // La delta es negativa cuando la rueda se mueve hacia abajo (alejar) y positiva hacia arriba (acercar)
+    const delta = e.deltaY * -0.01;
+    changeZoomLevel(zoomScale + delta, e.clientX, e.clientY);
+  };
+
+  // Swipe / arrastre con mouse en el popup - mejorado
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isZoomed) {
       setDragging(true);
@@ -89,6 +171,10 @@ export function CarouselHorizontal({
         x: e.clientX - position.x,
         y: e.clientY - position.y,
       });
+      // Cambiar cursor durante el arrastre
+      if (imageContainerRef.current) {
+        imageContainerRef.current.style.cursor = 'grabbing';
+      }
     } else {
       setSwipeStartX(e.clientX);
     }
@@ -114,6 +200,10 @@ export function CarouselHorizontal({
   const handleMouseUp = () => {
     if (dragging) {
       setDragging(false);
+      // Restaurar cursor después del arrastre
+      if (imageContainerRef.current) {
+        imageContainerRef.current.style.cursor = 'grab';
+      }
     } else if (swipeStartX !== null) {
       if (swipeDelta > SWIPE_THRESHOLD) {
         goToPreviousImage();
@@ -124,35 +214,94 @@ export function CarouselHorizontal({
       setSwipeDelta(0);
     }
   };
+  
+  // Manejar salida del cursor durante el arrastre
+  const handleMouseLeave = () => {
+    if (dragging) {
+      setDragging(false);
+      if (imageContainerRef.current) {
+        imageContainerRef.current.style.cursor = 'grab';
+      }
+    }
+  };
 
-  // Pinch-to-zoom y swipe en dispositivos táctiles
+  // Pinch-to-zoom y swipe en dispositivos táctiles - mejorado
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 1) {
-      setSwipeStartX(e.touches[0].clientX);
+      // Un dedo: para swipe o arrastre si está en zoom
+      if (isZoomed) {
+        setDragging(true);
+        setStartPosition({
+          x: e.touches[0].clientX - position.x,
+          y: e.touches[0].clientY - position.y,
+        });
+      } else {
+        setSwipeStartX(e.touches[0].clientX);
+      }
     }
     if (e.touches.length === 2) {
+      // Dos dedos: pinch-to-zoom
+      e.preventDefault(); // Prevenir el zoom nativo del navegador
       const [t1, t2] = [e.touches[0], e.touches[1]];
       const distance = Math.hypot(t2.pageX - t1.pageX, t2.pageY - t1.pageY);
       setInitialDistance(distance);
+      setInitialScale(zoomScale);
+      
+      // Guardar el punto medio entre los dos dedos para que sea el centro del zoom
+      const midX = (t1.clientX + t2.clientX) / 2;
+      const midY = (t1.clientY + t2.clientY) / 2;
+      setInitialPinchPosition({ x: midX, y: midY });
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (e.touches.length === 1 && swipeStartX !== null) {
-      const delta = e.touches[0].clientX - swipeStartX;
-      setSwipeDelta(delta);
+    if (e.touches.length === 1) {
+      if (isZoomed && dragging) {
+        // Arrastre con un dedo cuando está en zoom
+        const touch = e.touches[0];
+        const container = e.currentTarget.getBoundingClientRect();
+        const maxOffsetX = (container.width / 2) * (zoomScale - 1);
+        const maxOffsetY = (container.height / 2) * (zoomScale - 1);
+        const newX = touch.clientX - startPosition.x;
+        const newY = touch.clientY - startPosition.y;
+        setPosition({
+          x: Math.max(-maxOffsetX, Math.min(maxOffsetX, newX)),
+          y: Math.max(-maxOffsetY, Math.min(maxOffsetY, newY)),
+        });
+      } else if (swipeStartX !== null) {
+        // Swipe para cambiar de imagen
+        const delta = e.touches[0].clientX - swipeStartX;
+        setSwipeDelta(delta);
+      }
     }
     if (e.touches.length === 2 && initialDistance !== null) {
+      e.preventDefault(); // Prevenir el zoom nativo del navegador
+      
       const [t1, t2] = [e.touches[0], e.touches[1]];
       const currentDistance = Math.hypot(t2.pageX - t1.pageX, t2.pageY - t1.pageY);
-      const newScale = currentDistance / initialDistance;
-      setZoomScale(newScale);
-      setIsZoomed(newScale > 1);
+      
+      // Calcular nuevo factor de zoom basado en la distancia entre dedos
+      const scale = currentDistance / initialDistance;
+      const newZoomScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, initialScale * scale));
+      
+      // Calcular el punto medio actual entre los dos dedos
+      const midX = (t1.clientX + t2.clientX) / 2;
+      const midY = (t1.clientY + t2.clientY) / 2;
+      
+      // Aplicar el nuevo zoom con centro en el punto medio de los dedos
+      if (imageContainerRef.current) {
+        changeZoomLevel(newZoomScale, midX, midY);
+      } else {
+        setZoomScale(newZoomScale);
+        setIsZoomed(newZoomScale > 1);
+      }
     }
   };
 
   const handleTouchEnd = () => {
-    if (swipeStartX !== null) {
+    if (dragging) {
+      setDragging(false);
+    } else if (swipeStartX !== null) {
       if (swipeDelta > SWIPE_THRESHOLD) {
         goToPreviousImage();
       } else if (swipeDelta < -SWIPE_THRESHOLD) {
@@ -162,6 +311,7 @@ export function CarouselHorizontal({
       setSwipeDelta(0);
     }
     setInitialDistance(null);
+    setInitialScale(zoomScale);
   };
 
   const goToPreviousImage = () => {
@@ -253,7 +403,7 @@ export function CarouselHorizontal({
         </div>
       </div>
 
-      {/* Popup para imagen ampliada */}
+      {/* Popup para imagen ampliada - mejorado con controles de zoom */}
       {showPopup && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4 sm:p-8"
@@ -294,6 +444,7 @@ export function CarouselHorizontal({
               <ChevronRight className="w-4 h-4 text-white" />
             </div>
             <div
+              ref={imageContainerRef}
               className={`relative ${isZoomed ? "cursor-grab" : "cursor-zoom-in"} transition-transform duration-300 ${
                 slideDirection === "left"
                   ? "animate-in slide-in-from-left"
@@ -302,10 +453,50 @@ export function CarouselHorizontal({
                   : ""
               }`}
               onDoubleClick={handleZoomToggle}
+              onWheel={handleWheel}
+              onMouseLeave={handleMouseLeave}
             >
-              <p className="absolute bottom-3 left-3 text-white text-sm z-10 bg-black bg-opacity-50 px-2 py-1 rounded">
-                {isZoomed ? "Arrastra para mover" : "Doble clic para zoom"}
-              </p>
+              {/* Mostrar nivel de zoom actual */}
+              {isZoomed && (
+                <div className="absolute bottom-3 left-3 flex flex-col gap-2 z-20">
+                  <div className="text-white text-xs bg-black bg-opacity-60 px-2 py-1 rounded">
+                    {Math.round(zoomScale * 100)}%
+                  </div>
+                </div>
+              )}
+              
+              {/* Controles de zoom */}
+              <div className="absolute bottom-3 right-3 flex gap-1 bg-black bg-opacity-60 rounded p-1 z-20">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-white hover:bg-white/20"
+                  onClick={handleZoomOut}
+                  disabled={zoomScale <= MIN_ZOOM}
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-white hover:bg-white/20"
+                  onClick={handleZoomIn}
+                  disabled={zoomScale >= MAX_ZOOM}
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+                {isZoomed && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-white hover:bg-white/20"
+                    onClick={resetZoom}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              
               <Image
                 src={images[currentIndex]}
                 alt={`Imagen ${currentIndex + 1}`}
@@ -313,12 +504,14 @@ export function CarouselHorizontal({
                 width={800}
                 height={800}
                 sizes="100vw"
+                priority={currentIndex === 0}
                 className="object-contain w-full h-auto max-h-screen"
                 style={{
                   transform: isZoomed
                     ? `scale(${zoomScale}) translate(${position.x}px, ${position.y}px)`
                     : "scale(1)",
                   transition: dragging ? "none" : "transform 0.3s ease-in-out",
+                  transformOrigin: "center center"
                 }}
               />
             </div>
