@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import CulqiScript from "@/components/CulqiScript";
 import PageTransitionWrapper from "@/components/PageTransitionWrapper";
 import LoadingAnimation from "@/components/LoadingAnimation";
+import Script from "next/script";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -38,20 +39,23 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9G4V0FEFXE"></script>
-        <script>
+        {/* Metatags adicionales si se requieren */}
+      </head>
+      <body className={`${jost.variable} antialiased`}>
+        {/* Google Analytics script using next/script */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-9G4V0FEFXE"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-
             gtag('config', 'G-9G4V0FEFXE');
           `}
-        </script>
-        {/* Metatags adicionales si se requieren */}
-      </head>
-      <body className={`${jost.variable} antialiased`}>
+        </Script>
+        
         <ThemeWrapper>
           {/* Suspense sigue envolviendo el contenido en caso de componentes con Suspense */}
           <Suspense fallback={<LoadingAnimation />}>

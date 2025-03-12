@@ -69,7 +69,7 @@ const saveProductToCache = (product: ProductType, fallbackSlug?: string) => {
   
   try {
     // Check if product has the expected structure
-    const slug = product.attributes?.slug || 
+    const slug = product.slug || 
                 (fallbackSlug ? fallbackSlug : 
                 (typeof product === 'object' && 'id' in product ? `product-${product.id}` : 'unknown-product'));
     
