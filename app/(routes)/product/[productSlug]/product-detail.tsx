@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CarouselVertical } from "./components/carousel-vertical";
 import { CarouselHorizontal } from "./components/carousel-horizontal";
 import ProductInfo from "./components/product-info";
@@ -12,13 +12,139 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { ProductType } from "@/types/product"; // Asegúrate de que la ruta sea correcta
+import useSWR from 'swr';
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductDetailProps {
-  product: ProductType;
+  product?: ProductType | null;
+  fallbackSlug?: string;
 }
 
-export default function ProductDetail({ product }: ProductDetailProps) {
+// Function to fetch product data client-side
+const fetchProduct = async (slug: string) => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "");
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
+  }
+  const url = `${baseUrl}/api/products?filters[slug][$eq]=${slug}&populate=*`;
+  
+  const res = await fetch(url, { cache: 'force-cache' });
+  if (!res.ok) {
+    throw new Error(`Error HTTP: ${res.status}`);
+  }
+  const data = await res.json();
+  return data.data && data.data.length > 0 ? data.data[0] : null;
+};
+
+// Function to retrieve cached product from localStorage
+const getCachedProduct = (slug: string): ProductType | null => {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    // Try different possible formats of the cache key
+    let cached = localStorage.getItem(`product-${slug}`);
+    
+    // If not found, try alternative formats
+    if (!cached) {
+      // Look through all localStorage keys to find any that might match
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.includes(slug)) {
+          cached = localStorage.getItem(key);
+          break;
+        }
+      }
+    }
+    
+    return cached ? JSON.parse(cached) : null;
+  } catch (error) {
+    console.error('Error reading from cache:', error);
+    return null;
+  }
+};
+
+// Function to save product to localStorage
+const saveProductToCache = (product: ProductType, fallbackSlug?: string) => {
+  if (typeof window === 'undefined' || !product) return;
+  
+  try {
+    // Check if product has the expected structure
+    const slug = product.attributes?.slug || 
+                (fallbackSlug ? fallbackSlug : 
+                (typeof product === 'object' && 'id' in product ? `product-${product.id}` : 'unknown-product'));
+    
+    localStorage.setItem(`product-${slug}`, JSON.stringify(product));
+  } catch (error) {
+    console.error('Error saving to cache:', error);
+  }
+};
+
+export default function ProductDetail({ product, fallbackSlug }: ProductDetailProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [cachedProduct, setCachedProduct] = useState<ProductType | null>(null);
+  
+  // If we have fallbackSlug but no product, try to use SWR to fetch it
+  const { data: swrProduct } = useSWR(
+    fallbackSlug && !product ? fallbackSlug : null,
+    fetchProduct,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      dedupingInterval: 3600000, // 1 hour
+    }
+  );
+  
+  // On initial load, check localStorage for the product
+  useEffect(() => {
+    if (fallbackSlug && !product) {
+      const cached = getCachedProduct(fallbackSlug);
+      if (cached) {
+        setCachedProduct(cached);
+      }
+    }
+  }, [fallbackSlug, product]);
+  
+  // When we get a product either from props or SWR, save it to cache
+  useEffect(() => {
+    const productToCache = product || swrProduct;
+    if (productToCache) {
+      saveProductToCache(productToCache, fallbackSlug);
+    }
+  }, [product, swrProduct, fallbackSlug]);
+  
+  // Determine which product data to use (prop, SWR, or cached)
+  const displayProduct = product || swrProduct || cachedProduct;
+  
+  if (!displayProduct) {
+    // Skeleton loading state
+    return (
+      <div className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 sm:gap-6">
+          <div className="sm:col-span-8 lg:col-span-7 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+            <div className="order-1 sm:order-2 w-full max-w-lg">
+              <Skeleton className="h-96 w-full rounded-md" />
+            </div>
+            <div className="order-2 sm:order-1 flex-shrink-0 w-full sm:w-auto">
+              <div className="flex flex-row sm:flex-col gap-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-16 w-16 rounded-md" />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="sm:col-span-4 lg:col-span-5 order-3">
+            <Skeleton className="h-10 w-3/4 mb-4" />
+            <Skeleton className="h-8 w-1/4 mb-2" />
+            <Skeleton className="h-24 w-full mb-4" />
+            <Skeleton className="h-10 w-full mb-4" />
+          </div>
+        </div>
+        <div className="mt-6">
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6">
@@ -34,7 +160,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           {/* Carrusel Horizontal (abajo en móvil, derecha en escritorio) */}
           <div className="order-1 sm:order-2 w-full max-w-lg">
             <CarouselHorizontal
-              product={product}
+              product={displayProduct}
               currentIndex={currentIndex}
               onChange={setCurrentIndex}
             />
@@ -46,7 +172,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                           w-full sm:w-auto"
           >
             <CarouselVertical
-              product={product}
+              product={displayProduct}
               currentIndex={currentIndex}
               onChange={setCurrentIndex}
             />
@@ -55,13 +181,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
         {/* Info del producto a la derecha en escritorio */}
         <div className="sm:col-span-4 lg:col-span-5 order-3">
-          <ProductInfo product={product} />
+          <ProductInfo product={displayProduct} />
         </div>
       </div>
 
       {/* Sección de información adicional */}
       <div className="mt-6 sm:mt-8">
-        <InfoAdicional product={product} />
+        <InfoAdicional product={displayProduct} />
       </div>
 
       {/* Sección de Preguntas Frecuentes centrada */}
