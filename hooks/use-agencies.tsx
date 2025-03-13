@@ -37,7 +37,10 @@ export function useAgencies() {
       setError(null);
 
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:1337";
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+        if (!backendUrl) {
+          throw new Error('NEXT_PUBLIC_BACKEND_URL no está configurado');
+        }
         console.log("Backend URL:", backendUrl);
 
         let page = 1;
@@ -50,12 +53,13 @@ export function useAgencies() {
 
           const res = await fetch(url, {
             headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store' // Para evitar caché en producción
           });
 
           if (!res.ok) {
-            const errorBody = await res.text();
-            console.error('API Error Details:', errorBody);
-            throw new Error(`API request failed with status ${res.status}`);
+            const errorData = await res.json();
+            console.error('Error del API:', errorData);
+            throw new Error(`Error ${res.status}: ${errorData.error?.message || 'Falló la solicitud'}`);
           }
 
           const json: ShalomResponse = await res.json();
