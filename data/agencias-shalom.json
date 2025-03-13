@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "nombre": "Agencia Central",
+    "direccion": "Av. Principal 123",
+    "telefono": "+51 123 456 789",
+    "horario": "L-V 9:00 AM - 6:00 PM"
+  },
+  {
+    "id": 2,
+    "nombre": "Sucursal Norte",
+    "direccion": "Calle Secundaria 456",
+    "telefono": "+51 987 654 321",
+    "horario": "L-S 8:00 AM - 7:00 PM"
+  }
+]

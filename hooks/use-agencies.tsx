@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
 
-/**
- * El tipo que ya tienes para tu arreglo final.
- * No lo modificamos.
- */
 export interface Agency {
   id: string;
   name: string;
@@ -11,73 +7,71 @@ export interface Agency {
   direction: string;
 }
 
-/**
- * 1. Describimos cómo luce el objeto que viene en `json.data[]`.
- *    (Ajusta los campos si Strapi te manda algo diferente)
- */
 interface ShalomItemFromStrapi {
-  id: number; // o string, según tu Strapi
-  attributes?: {
-    nombre?: string;
-    ubicacion?: string;
-    direccion?: string;
-  };
-  nombre?: string;
-  ubicacion?: string;
-  direccion?: string;
+  id: number;
+  nombre: string;
+  ubicacion: string;
+  direccion: string;
 }
 
-/**
- * 2. Describimos la meta que te manda Strapi
- */
-interface ShalomMeta {
-  pagination: {
-    page: number;
-    pageSize: number;
-    pageCount: number;
-    total: number;
-  };
-}
-
-/**
- * 3. Describimos la respuesta completa de tu fetch
- */
 interface ShalomResponse {
   data: ShalomItemFromStrapi[];
-  meta: ShalomMeta;
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
 }
 
-/**
- * 4. El hook que obtiene las agencias de Strapi
- */
 export function useAgencies() {
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchAgencies() {
+      setIsLoading(true);
+      setError(null);
+
       try {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:1337";
+        console.log("Backend URL:", backendUrl);
+
         let page = 1;
         let allAgencies: Agency[] = [];
         let totalPages = 1;
 
         do {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/shaloms?populate=*&pagination[page]=${page}&pagination[pageSize]=100`
-          );
-          // Aquí tipamos la respuesta como ShalomResponse en vez de any
+          const url = `${backendUrl}/api/shaloms?pagination[page]=${page}&pagination[pageSize]=100`;
+          console.log("Fetching agencies from:", url);
+
+          const res = await fetch(url, {
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          if (!res.ok) {
+            const errorBody = await res.text();
+            console.error('API Error Details:', errorBody);
+            throw new Error(`API request failed with status ${res.status}`);
+          }
+
           const json: ShalomResponse = await res.json();
           console.log("Agencies page " + page, json);
 
-          // Mapeamos sin usar `any`:
-          const agencias: Agency[] = json.data.map((item: ShalomItemFromStrapi) => ({
-            id: String(item.id),
-            name: item.nombre ?? "", // Use the direct field instead of item.attributes.nombre
-            ubicacion: item.ubicacion ?? "", // Use the direct field instead of item.attributes.ubicacion
-            direction: item.direccion ?? "", // Use the direct field instead of item.attributes.direccion
-          }));
+          const agencias: Agency[] = json.data.map((item: ShalomItemFromStrapi) => {
+            console.log('Estructura completa de item:', JSON.stringify(item, null, 2));
+            return ({
+              id: String(item.id || ''),
+              name: item.nombre || 'Nombre no disponible',
+              ubicacion: item.ubicacion || 'Ubicación no especificada',
+              direction: item.direccion || 'Dirección no proporcionada',
+            });
+          });
 
-          allAgencies = allAgencies.concat(agencias);
+          allAgencies = [...allAgencies, ...agencias];
           totalPages = json.meta.pagination.pageCount;
           page++;
         } while (page <= totalPages);
@@ -85,6 +79,7 @@ export function useAgencies() {
         setAgencies(allAgencies);
       } catch (error) {
         console.error("Error fetching agencies:", error);
+        setError(error instanceof Error ? error.message : "An unknown error occurred");
       } finally {
         setIsLoading(false);
       }
@@ -93,5 +88,5 @@ export function useAgencies() {
     fetchAgencies();
   }, []);
 
-  return { agencies, isLoading };
+  return { agencies, isLoading, error };
 }

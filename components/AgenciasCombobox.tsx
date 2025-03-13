@@ -73,24 +73,45 @@ function AgenciasCombobox({
 
   // Filtramos y ordenamos las agencias según la consulta
   const sortedAgencies = useMemo(() => {
-    if (queryWords.length === 0) return [];
+    if (queryWords.length === 0) {
+      // Return all agencies sorted by name when no query
+      return [...agencies].sort((a, b) => a.name.localeCompare(b.name));
+    }
     const filtered = agencies.filter((agency) => {
+      const normalizedName = normalizeText(agency.name);
       const normalizedUbic = normalizeUbicacion(agency.ubicacion);
-      return queryWords.every((word) => normalizedUbic.includes(word));
+      const normalizedDirection = normalizeText(agency.direction);
+      
+      return queryWords.every((word) =>
+        normalizedName.includes(word) ||
+        normalizedUbic.includes(word) ||
+        normalizedDirection.includes(word)
+      );
     });
+    
     return filtered.sort((a, b) => {
-      const aValue = normalizeUbicacion(a.ubicacion);
-      const bValue = normalizeUbicacion(b.ubicacion);
-      const scoreA = queryWords.reduce(
-        (acc, word) =>
-          acc + (aValue.indexOf(word) === -1 ? 1000 : aValue.indexOf(word)),
-        0
-      );
-      const scoreB = queryWords.reduce(
-        (acc, word) =>
-          acc + (bValue.indexOf(word) === -1 ? 1000 : bValue.indexOf(word)),
-        0
-      );
+      const aName = normalizeText(a.name);
+      const aUbic = normalizeUbicacion(a.ubicacion);
+      const aDir = normalizeText(a.direction);
+      
+      const bName = normalizeText(b.name);
+      const bUbic = normalizeUbicacion(b.ubicacion);
+      const bDir = normalizeText(b.direction);
+      
+      const scoreA = queryWords.reduce((acc, word) => {
+        return acc +
+          (aName.includes(word) ? 0 : 1000) +
+          (aUbic.includes(word) ? 0 : 2000) +
+          (aDir.includes(word) ? 0 : 3000);
+      }, 0);
+      
+      const scoreB = queryWords.reduce((acc, word) => {
+        return acc +
+          (bName.includes(word) ? 0 : 1000) +
+          (bUbic.includes(word) ? 0 : 2000) +
+          (bDir.includes(word) ? 0 : 3000);
+      }, 0);
+      
       return scoreA - scoreB;
     });
   }, [agencies, queryWords]);
@@ -142,35 +163,16 @@ function AgenciasCombobox({
         <CommandList
           onScroll={handleScroll}
           ref={scrollRef}
-          className="max-h-60 overflow-auto"
+          className="max-h-60 overflow-auto z-50"
         >
-          {/* Lógica para ver qué mostrar según searchQuery y selectedAgency */}
-          {searchQuery.trim() === "" ? (
-            selectedAgency ? (
-              // Si NO hay búsqueda, pero SÍ hay agencia => tarjeta
-              <div className="p-2 space-y-1">
-                <p className="font-semibold">{selectedAgency.name}</p>
-                <p className="text-sm">{selectedAgency.direction}</p>
-                <p className="text-xs text-muted-foreground">
-                  {selectedAgency.ubicacion}
-                </p>
-              </div>
-            ) : (
-              // Si NO hay búsqueda y NO hay agencia => mensaje "Ingresa..."
-              <CommandEmpty>
-                Ingresa el nombre o ubicación para buscar.
-              </CommandEmpty>
-            )
-          ) : visibleAgencies.length === 0 ? (
-            // Si hay búsqueda, pero no hay resultados => "No se encontraron..."
+          {visibleAgencies.length === 0 ? (
             <CommandEmpty>No se encontraron agencias.</CommandEmpty>
           ) : (
-            // Si hay búsqueda y resultados => lista de agencias
             <CommandGroup>
               {visibleAgencies.map((agency) => (
                 <CommandItem
                   key={agency.id}
-                  value={normalizeUbicacion(agency.ubicacion)}
+                  value={`${agency.name} ${agency.ubicacion} ${agency.direction}`}
                   onSelect={() => handleSelect(agency)}
                 >
                   <div>

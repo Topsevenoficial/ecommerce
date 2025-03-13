@@ -39,6 +39,15 @@ interface CustomerFormProps {
   setShippingMethod: (value: "shalom" | "olva") => void;
 }
 
+export function validateAgencies(agencies: any[]): Agency[] {
+  return agencies.filter(agency => 
+    agency.id && 
+    agency.name &&
+    agency.ubicacion &&
+    agency.direction
+  );
+}
+
 const CustomerForm: React.FC<CustomerFormProps> = ({
   customerData,
   handleChange,
@@ -185,11 +194,16 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   <p className="text-sm text-muted-foreground">
                     Cargando agencias...
                   </p>
+                ) : validateAgencies(agencies).length === 0 ? (
+                  <p className="text-sm text-destructive">
+                    No se encontraron agencias disponibles
+                  </p>
                 ) : (
                   <AgenciasCombobox
-                    agencies={agencies}
+                    agencies={validateAgencies(agencies)}
                     selectedAgency={selectedAgency}
                     onSelect={onSelectAgency}
+                    className="w-full"
                   />
                 )}
               </div>
@@ -219,31 +233,30 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 <label className="block text-sm font-medium mb-1">DNI</label>
                 <div className="flex items-center gap-1">
                   <Input
+                    id="dni"
                     type="text"
                     name="dni"
                     value={customerData.dni}
                     onChange={handleDNIChange}
                     placeholder="12345678"
+                    maxLength={8}
                     required
-                    inputMode="numeric"
-                    pattern="[0-9]*"
                   />
                   <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-  <TooltipTrigger asChild>
-    <span
-      className="cursor-pointer"
-      onClick={() => setTooltipOpen((prev) => !prev)}
-    >
-      <Info className="w-4 h-4 text-muted-foreground" />
-    </span>
-  </TooltipTrigger>
-  <TooltipContent className="p-2">
-    <p className="text-xs">
-      Para registrar el envío y generar la boleta.
-    </p>
-  </TooltipContent>
-</Tooltip>
-
+                    <TooltipTrigger asChild>
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => setTooltipOpen((prev) => !prev)}
+                      >
+                        <Info className="w-4 h-4 text-muted-foreground" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent className="p-2">
+                      <p className="text-xs">
+                        Para registrar el envío y generar la boleta.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
             </div>
@@ -283,31 +296,30 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <label className="block text-sm font-medium mb-1">DNI</label>
               <div className="flex items-center gap-1">
                 <Input
+                  id="dni"
                   type="text"
                   name="dni"
                   value={customerData.dni}
                   onChange={handleDNIChange}
                   placeholder="12345678"
+                  maxLength={8}
                   required
-                  inputMode="numeric"
-                  pattern="[0-9]*"
                 />
-               <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-  <TooltipTrigger asChild>
-    <span
-      className="cursor-pointer"
-      onClick={() => setTooltipOpen((prev) => !prev)}
-    >
-      <Info className="w-4 h-4 text-muted-foreground" />
-    </span>
-  </TooltipTrigger>
-  <TooltipContent className="p-2">
-    <p className="text-xs">
-      Para registrar el envío y generar la boleta.
-    </p>
-  </TooltipContent>
-</Tooltip>
-
+                <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => setTooltipOpen((prev) => !prev)}
+                    >
+                      <Info className="w-4 h-4 text-muted-foreground" />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent className="p-2">
+                    <p className="text-xs">
+                      Para registrar el envío y generar la boleta.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           </div>
