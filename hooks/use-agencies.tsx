@@ -32,11 +32,25 @@ export function useAgencies() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchAgencies() {
+    const fetchAgencies = async () => {
+      const CACHE_KEY = 'agencies_cache';
+      const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 semana en milisegundos
+
       setIsLoading(true);
       setError(null);
 
       try {
+        // Verificar si hay datos en cache
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            setAgencies(data);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
         if (!backendUrl) {
           throw new Error('NEXT_PUBLIC_BACKEND_URL no está configurado');
@@ -81,6 +95,12 @@ export function useAgencies() {
           page++;
         } while (page <= totalPages);
 
+        // Almacenar los nuevos datos en cache
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          data: allAgencies,
+          timestamp: Date.now()
+        }));
+
         setAgencies(allAgencies);
       } catch (error) {
         console.error("Error fetching agencies:", error);
@@ -88,7 +108,7 @@ export function useAgencies() {
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
     fetchAgencies();
   }, []);
