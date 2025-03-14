@@ -97,10 +97,15 @@ export function useAgencies() {
         setAgencies(allAgencies);
         setIsLoading(false);
       } catch (error) {
-        if (error.name !== 'AbortError') {
+        if (error instanceof Error && error.name !== 'AbortError') {
           console.error('Error loading agencies:', error);
-          setError(error instanceof Error ? error.message : "An unknown error occurred");
+          setError(error.message);
+        } else if (typeof error === 'string') {
+          setError(error);
+        } else {
+          setError('An unknown error occurred');
         }
+        setIsLoading(false);
       }
     };
 
