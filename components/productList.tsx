@@ -44,10 +44,16 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
     }
   );
 
+  const sortedProducts = flattenedProducts.sort((a, b) => {
+    if (a.isFeatured && !b.isFeatured) return -1;
+    if (!a.isFeatured && b.isFeatured) return 1;
+    return 0;
+  });
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {flattenedProducts.map((prod) => (
+        {sortedProducts.map((prod) => (
           <ProductCard
             key={prod.combinedId}
             product={prod}
