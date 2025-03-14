@@ -32,12 +32,11 @@ export function useAgencies() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAgencies = async () => {
+    const abortController = new AbortController();
+
+    const loadAgencies = async () => {
       const CACHE_KEY = 'agencies_cache';
       const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 semana en milisegundos
-
-      setIsLoading(true);
-      setError(null);
 
       try {
         // Verificar si hay datos en cache
@@ -55,7 +54,6 @@ export function useAgencies() {
         if (!backendUrl) {
           throw new Error('NEXT_PUBLIC_BACKEND_URL no está configurado');
         }
-        console.log("Backend URL:", backendUrl);
 
         let page = 1;
         let allAgencies: Agency[] = [];
@@ -63,32 +61,27 @@ export function useAgencies() {
 
         do {
           const url = `${backendUrl}/api/shaloms?pagination[page]=${page}&pagination[pageSize]=100`;
-          console.log("Fetching agencies from:", url);
 
           const res = await fetch(url, {
             headers: { 'Content-Type': 'application/json' },
             cache: 'force-cache',
-            next: { revalidate: 3600 }
+            next: { revalidate: 3600 },
+            signal: abortController.signal
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            console.error('Error del API:', errorData);
             throw new Error(`Error ${res.status}: ${errorData.error?.message || 'Falló la solicitud'}`);
           }
 
           const json: ShalomResponse = await res.json();
-          console.log("Agencies page " + page, json);
 
-          const agencias: Agency[] = json.data.map((item: ShalomItemFromStrapi) => {
-            console.log('Estructura completa de item:', JSON.stringify(item, null, 2));
-            return ({
-              id: String(item.id || ''),
-              name: item.nombre || 'Nombre no disponible',
-              ubicacion: item.ubicacion || 'Ubicación no especificada',
-              direction: item.direccion || 'Dirección no proporcionada',
-            });
-          });
+          const agencias: Agency[] = json.data.map((item: ShalomItemFromStrapi) => ({
+            id: String(item.id || ''),
+            name: item.nombre || 'Nombre no disponible',
+            ubicacion: item.ubicacion || 'Ubicación no especificada',
+            direction: item.direccion || 'Dirección no proporcionada',
+          }));
 
           allAgencies = [...allAgencies, ...agencias];
           totalPages = json.meta.pagination.pageCount;
@@ -102,15 +95,20 @@ export function useAgencies() {
         }));
 
         setAgencies(allAgencies);
-      } catch (error) {
-        console.error("Error fetching agencies:", error);
-        setError(error instanceof Error ? error.message : "An unknown error occurred");
-      } finally {
         setIsLoading(false);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error loading agencies:', error);
+          setError(error instanceof Error ? error.message : "An unknown error occurred");
+        }
       }
     };
 
-    fetchAgencies();
+    loadAgencies();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   return { agencies, isLoading, error };
