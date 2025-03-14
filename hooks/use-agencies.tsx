@@ -53,7 +53,8 @@ export function useAgencies() {
 
           const res = await fetch(url, {
             headers: { 'Content-Type': 'application/json' },
-            cache: 'no-store' // Para evitar caché en producción
+            cache: 'force-cache',
+            next: { revalidate: 3600 }
           });
 
           if (!res.ok) {
