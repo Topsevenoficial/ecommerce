@@ -35,13 +35,6 @@ interface CartItem {
   images?: { url: string }[];
 }
 
-interface Agency {
-  id: string;
-  name: string;
-  ubicacion: string;
-  direction: string;
-}
-
 interface CustomerData {
   first_name: string;
   last_name: string;
