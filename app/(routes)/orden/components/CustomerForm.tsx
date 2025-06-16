@@ -4,7 +4,6 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import AgenciasCombobox from "@/components/AgenciasCombobox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info, Store, Truck } from "lucide-react";
 
@@ -38,10 +37,8 @@ interface CustomerFormProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleDNIChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error: string;
-  agencies: Agency[];
-  isLoading: boolean;
-  selectedAgency: Agency | null;
-  onSelectAgency: (agency: Agency) => void;
+  agencyName: string;
+  onAgencyNameChange: (name: string) => void;
   shippingMethod: "shalom" | "olva";
   setShippingMethod: (value: "shalom" | "olva") => void;
 }
@@ -60,10 +57,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   handleChange,
   handleDNIChange,
   error,
-  agencies,
-  isLoading,
-  selectedAgency,
-  onSelectAgency,
+  agencyName,
+  onAgencyNameChange,
   shippingMethod,
   setShippingMethod,
 }) => {
@@ -195,23 +190,15 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             <div className="flex flex-col gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Busca tu agencia
+                  Ingresa tu agencia
                 </label>
-                {isLoading ? (
-                  <p className="text-sm text-muted-foreground">
-                    Cargando agencias...
-                  </p>
-                ) : validateAgencies(agencies).length === 0 ? (
-                  <p className="text-sm text-destructive">
-                    No se encontraron agencias disponibles
-                  </p>
-                ) : (
-                  <AgenciasCombobox
-                    agencies={validateAgencies(agencies)}
-                    selectedAgency={selectedAgency}
-                    onSelect={onSelectAgency}
-                  />
-                )}
+                <Input
+                  type="text"
+                  value={agencyName}
+                  onChange={(e) => onAgencyNameChange(e.target.value)}
+                  placeholder="Ingresa tu agencia Shalom"
+                  required
+                />
               </div>
             </div>
 
@@ -226,13 +213,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   name="address_city"
                   value={customerData.address_city}
                   onChange={handleChange}
-                  placeholder="Selecciona la agencia"
+                  placeholder="Ingresa la ciudad"
                   required
-                  readOnly
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Se autocompleta al elegir agencia.
-                </p>
               </div>
 
               <div>

@@ -57,9 +57,9 @@ interface OrderSummaryProps {
   items: CartItem[];
   total: number;
   removeItem: (id: string) => void;
-  selectedAgency: Agency | null;
   shippingMethod: "shalom" | "olva";
   customerData: CustomerData;
+  agencyName: string;
 }
 
 const PaymentMethodsList: React.FC = () => {
@@ -102,9 +102,9 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   items,
   total,
   removeItem,
-  selectedAgency,
   shippingMethod,
   customerData,
+  agencyName,
 }) => {
   // Si el envío es "olva" cuesta 20; para "shalom" es 0.
   const shippingCost = shippingMethod === "olva" ? 20 : 0;
@@ -142,27 +142,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       </div>
 
       {/* Información de Envío */}
-      {shippingMethod === "shalom" && selectedAgency ? (
+      {shippingMethod === "shalom" && agencyName ? (
         <div className="mb-6 p-3 border rounded-md bg-secondary/30">
           <h3 className="text-lg font-semibold mb-2">Envío por Agencia</h3>
           <p className="text-sm text-muted-foreground">
-            <span className="font-medium">Agencia:</span> {selectedAgency.name}
+            <span className="font-medium">Agencia:</span> {agencyName}
           </p>
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium">Ubicación:</span> {selectedAgency.ubicacion}
-          </p>
-          <Accordion type="single" collapsible className="mt-2">
-            <AccordionItem value="agency-summary">
-              <AccordionTrigger className="text-sm font-medium">
-                {selectedAgency.direction.length > 20
-                  ? `${selectedAgency.direction.slice(0, 20)}...`
-                  : selectedAgency.direction}
-              </AccordionTrigger>
-              <AccordionContent className="text-sm">
-                Dirección completa: {selectedAgency.direction}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
           <p className="text-xs text-muted-foreground mt-2">
             * El recojo en agencia Shalom no tiene costo adicional.
           </p>

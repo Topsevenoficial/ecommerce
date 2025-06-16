@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
-import { useAgencies, Agency } from "@/hooks/use-agencies";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -44,23 +44,35 @@ export default function OrdenPage() {
     dni: "",
   });
 
-  const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
   const [error, setError] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<"shalom" | "olva">("shalom");
-
-  const { agencies, isLoading } = useAgencies();
+  const [agencyName, setAgencyName] = useState("");
 
   useEffect(() => {
     if (shippingMethod === "olva") {
-      setSelectedAgency(null);
       setCustomerData((prev) => ({
         ...prev,
         address: "",
-        address_city: "",
+      }));
+    } else {
+      // When switching to shalom method, update the address field with the agency name
+      setCustomerData(prev => ({
+        ...prev,
+        address: agencyName,
       }));
     }
-  }, [shippingMethod]);
+  }, [shippingMethod, agencyName]);
+
+  const handleAgencyNameChange = (name: string) => {
+    setAgencyName(name);
+    if (shippingMethod === "shalom") {
+      setCustomerData(prev => ({
+        ...prev,
+        address: name,
+      }));
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -81,14 +93,7 @@ export default function OrdenPage() {
     setError("");
   };
 
-  const handleAgencySelect = (agency: Agency) => {
-    setSelectedAgency(agency);
-    setCustomerData((prev) => ({
-      ...prev,
-      address: agency.ubicacion,
-      address_city: agency.name,
-    }));
-  };
+
 
   const handlePay = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -154,10 +159,8 @@ export default function OrdenPage() {
                     handleChange={handleChange}
                     handleDNIChange={handleDNIChange}
                     error={error}
-                    agencies={agencies}
-                    isLoading={isLoading}
-                    selectedAgency={selectedAgency}
-                    onSelectAgency={handleAgencySelect}
+                    agencyName={agencyName}
+                    onAgencyNameChange={handleAgencyNameChange}
                     shippingMethod={shippingMethod}
                     setShippingMethod={setShippingMethod}
                   />
@@ -188,9 +191,9 @@ export default function OrdenPage() {
                   items={items.map((item) => ({ ...item, id: item.id.toString() }))}
                   total={total}
                   removeItem={(id: string) => removeItem(Number(id))}  // Convertir id string a number
-                  selectedAgency={selectedAgency}
                   shippingMethod={shippingMethod}
                   customerData={customerData}
+                  agencyName={agencyName}
                 />
               </div>
             </div>
