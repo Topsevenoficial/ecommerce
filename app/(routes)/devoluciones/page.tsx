@@ -46,7 +46,7 @@ export default function DevolucionesPage() {
 
       <h1 className="text-2xl font-bold mb-4">Política de Devoluciones</h1>
       <p className="mb-4">
-        Aceptamos devoluciones en un plazo de 3 meses desde la fecha de compra.
+        Aceptamos devoluciones en un plazo de 30 días desde la fecha de compra.
         Para que una devolución sea válida, el producto debe estar sin uso y en
         perfectas condiciones, conservando su empaque original y accesorios.
       </p>

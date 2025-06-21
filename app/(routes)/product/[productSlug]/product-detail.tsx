@@ -14,6 +14,9 @@ import {
 import { ProductType } from "@/types/product"; // Asegúrate de que la ruta sea correcta
 import useSWR from 'swr';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, CreditCard, Truck, Package, AlertTriangle, RefreshCw, Shield, ExternalLink, CheckCircle2, Lock } from "lucide-react";
 
 interface ProductDetailProps {
   product?: ProductType | null;
@@ -190,81 +193,217 @@ export default function ProductDetail({ product, fallbackSlug }: ProductDetailPr
         <InfoAdicional product={displayProduct} />
       </div>
 
-      {/* Sección de Preguntas Frecuentes centrada */}
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Preguntas Frecuentes
-        </h2>
-        <Accordion type="multiple">
-          <AccordionItem value="item-1">
-            <AccordionTrigger>
-              ¿Cuáles son los métodos de pago disponibles?
-            </AccordionTrigger>
-            <AccordionContent>
-              Aceptamos pagos con tarjeta de crédito, débito, transferencias
-              bancarias, yape/plin e incluso pago contra entrega en la ciudad de
-              Cusco.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-2">
-            <AccordionTrigger>¿Cuánto tiempo tarda el envío?</AccordionTrigger>
-            <AccordionContent>
-              Los envíos se realizan a través de Shalom y tienen un plazo de
-              entrega de 2 a 5 días hábiles, dependiendo de la distancia desde
-              Cusco.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-3">
-            <AccordionTrigger>
-              ¿Cómo puedo hacer seguimiento de mi pedido?
-            </AccordionTrigger>
-            <AccordionContent>
-              Puedes hacer el seguimiento de tu pedido visitando la página de
-              rastreo de Shalom en{" "}
-              <a
-                href="https://rastrea.shalom.pe/"
-                className="text-primary hover:underline"
-                target="_blank"
+      {/* Sección de Preguntas Frecuentes */}
+      <section className="py-12 sm:py-16 bg-background border-t">
+        <div className="container max-w-5xl px-4 mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+              Preguntas Frecuentes
+            </h2>
+            <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
+              Encuentra respuestas a las dudas más comunes sobre nuestros productos y servicios
+            </p>
+          </div>
+          
+          <div className="space-y-5 max-w-4xl mx-auto">
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              <Card className="overflow-hidden border border-border/50 bg-card/50 hover:bg-card/70 transition-all duration-200 hover:shadow-lg">
+                <AccordionItem value="item-1" className="border-0">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/20 transition-colors">
+                    <span className="text-left text-base sm:text-lg font-semibold">
+                      <CreditCard className="h-5 w-5 mr-3 text-primary inline-block" />
+                      ¿Cuáles son los métodos de pago disponibles?
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-5 pt-0 text-base text-muted-foreground bg-muted/10">
+                    <div className="pt-4 space-y-3">
+                      <p>Aceptamos múltiples métodos de pago para tu comodidad:</p>
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>Tarjetas de crédito y débito</li>
+                        <li>Transferencias bancarias</li>
+                        <li>Yape / Plin</li>
+                        <li>Pago contra entrega (solo en Cusco)</li>
+                      </ul>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Card>
+
+              <Card className="overflow-hidden border border-border/50 bg-card/50 hover:bg-card/70 transition-all duration-200 hover:shadow-lg">
+                <AccordionItem value="item-2" className="border-0">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/20 transition-colors">
+                    <span className="text-left text-base sm:text-lg font-semibold">
+                      <Truck className="h-5 w-5 mr-3 text-primary inline-block" />
+                      ¿Cuánto tiempo tarda en llegar mi pedido?
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-5 pt-0 text-base text-muted-foreground bg-muted/10">
+                    <div className="pt-4 space-y-3">
+                      <p>Realizamos envíos a todo el Perú de lunes a sábado. El tiempo de entrega dependerá de la distancia desde Cusco.</p>
+                      <p>Una vez procesado tu pedido, te enviaremos un mensaje con el código de seguimiento para que puedas monitorear tu envío en tiempo real.</p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Card>
+
+              <Card className="overflow-hidden border border-border/50 bg-card/50 hover:bg-card/70 transition-all duration-200 hover:shadow-lg">
+                <AccordionItem value="item-3" className="border-0">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/20 transition-colors">
+                    <span className="text-left text-base sm:text-lg font-semibold">
+                      <Package className="h-5 w-5 mr-3 text-primary inline-block" />
+                      ¿Cómo puedo hacer seguimiento de mi pedido?
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-5 pt-0 text-base text-muted-foreground bg-muted/10">
+                    <div className="pt-4 space-y-4">
+                      <p>Puedes realizar el seguimiento de tu pedido de estas formas:</p>
+                      <div className="space-y-4">
+                        <a
+                          href="https://rastrea.shalom.pe/"
+                          className="flex items-center text-primary hover:underline font-medium"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          https://rastrea.shalom.pe/
+                        </a>
+                        <div className="pt-2">
+                          <p className="font-medium mb-2">O contáctanos por WhatsApp:</p>
+                          <a
+                            href="https://wa.me/51984670999?text=Hola,%20necesito%20información%20sobre%20el%20seguimiento%20de%20mi%20pedido"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                            +51 984 670 999
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Card>
+
+              <Card className="overflow-hidden border border-border/50 bg-card/50 hover:bg-card/70 transition-all duration-200 hover:shadow-lg">
+                <AccordionItem value="item-4" className="border-0">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/20 transition-colors">
+                    <span className="text-left text-base sm:text-lg font-semibold">
+                      <AlertTriangle className="h-5 w-5 mr-3 text-primary inline-block" />
+                      ¿Qué hago si mi producto tiene un defecto?
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-5 pt-0 text-base text-muted-foreground bg-muted/10">
+                    <div className="pt-4 space-y-4">
+                      <p>Si recibiste un producto con algún defecto de fábrica, sigue estos pasos:</p>
+                      <ol className="list-decimal pl-5 space-y-2">
+                        <li>Contáctanos dentro de las primeras 48 horas de recibido el producto</li>
+                        <li>Envíanos fotos claras del defecto</li>
+                        <li>Conserva el empaque y la boleta de compra original</li>
+                        <li>Te indicaremos el proceso de cambio o devolución</li>
+                      </ol>
+                      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
+                        <p className="text-yellow-700 text-sm">
+                          <strong>Importante:</strong> No aceptamos devoluciones de productos que presenten daños por mal uso o manipulación inadecuada.
+                        </p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Card>
+
+              <Card className="overflow-hidden border border-border/50 bg-card/50 hover:bg-card/70 transition-all duration-200 hover:shadow-lg">
+                <AccordionItem value="item-5" className="border-0">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/20 transition-colors">
+                    <span className="text-left text-base sm:text-lg font-semibold">
+                      <RefreshCw className="h-5 w-5 mr-3 text-primary inline-block" />
+                      ¿Puedo devolver o cambiar mi producto?
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-5 pt-0 text-base text-muted-foreground bg-muted/10">
+                    <div className="pt-4 space-y-4">
+                      <p>Nuestra política de devoluciones es la siguiente:</p>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-foreground mb-2">✅ Cambios</h4>
+                          <ul className="text-sm space-y-1">
+                            <li>• Plazo: 15 días</li>
+                            <li>• Producto en perfecto estado</li>
+                            <li>• Con empaque original</li>
+                            <li>• Con boleta de compra</li>
+                          </ul>
+                        </div>
+                        <div className="bg-green-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-foreground mb-2">🔄 Devoluciones</h4>
+                          <ul className="text-sm space-y-1">
+                            <li>• Plazo: 30 días</li>
+                            <li>• Reembolso en 3-5 días hábiles</li>
+                            <li>• Aplican restricciones</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Card>
+
+              <Card className="overflow-hidden border border-border/50 bg-card/50 hover:bg-card/70 transition-all duration-200 hover:shadow-lg">
+                <AccordionItem value="item-6" className="border-0">
+                  <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/20 transition-colors">
+                    <span className="text-left text-base sm:text-lg font-semibold">
+                      <Shield className="h-5 w-5 mr-3 text-primary inline-block" />
+                      ¿Cómo se utilizan mis datos personales?
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-5 pt-0 text-base text-muted-foreground bg-muted/10">
+                    <div className="pt-4 space-y-4">
+                      <p>En nuestra tienda valoramos y protegemos tu privacidad:</p>
+                      <div className="space-y-3">
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0">
+                            <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-foreground">Qué datos recopilamos</h4>
+                            <p className="text-sm">Solo la información necesaria para procesar tu compra y entregarte el mejor servicio.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0">
+                            <Lock className="h-5 w-5 text-blue-500 mr-2 mt-0.5" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-foreground">Cómo protegemos tus datos</h4>
+                            <p className="text-sm">Utilizamos protocolos de seguridad avanzados y no compartimos tu información con terceros.</p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground/80 pt-2">
+                        Para más detalles, consulta nuestra <a href="/politica-privacidad" className="text-primary hover:underline">Política de Privacidad</a>.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Card>
+            </Accordion>
+
+            <div className="text-center mt-12">
+              <p className="text-muted-foreground mb-4">
+                ¿No encontraste lo que buscabas?
+              </p>
+              <a 
+                href="https://wa.me/51984670999?text=Hola,%20tengo%20una%20consulta%20sobre%20un%20producto" 
+                target="_blank" 
                 rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
               >
-                https://rastrea.shalom.pe/
+                <MessageSquare className="h-4 w-4" />
+                Contáctanos por WhatsApp
               </a>
-              .
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-4">
-            <AccordionTrigger>
-              ¿Qué hago si mi producto tiene un defecto?
-            </AccordionTrigger>
-            <AccordionContent>
-              Si detectas un defecto de fabricación, contáctanos de inmediato
-              vía WhatsApp o llamada, teniendo a la mano tu boleta de compra
-              para iniciar el proceso de garantía.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-5">
-            <AccordionTrigger>
-              ¿Puedo devolver o cambiar mi producto?
-            </AccordionTrigger>
-            <AccordionContent>
-              Sí, ofrecemos un plazo de 3 meses para devoluciones. El producto
-              debe estar en perfectas condiciones, sin uso, y con su empaque
-              original. Consulta la sección de Política de Devoluciones para más
-              detalles.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-6">
-            <AccordionTrigger>
-              ¿Cómo se utilizan mis datos personales?
-            </AccordionTrigger>
-            <AccordionContent>
-              Solo recopilamos la información necesaria para gestionar tus
-              pedidos y envíos. Tus datos se mantienen seguros y se usan
-              exclusivamente para estos fines.
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

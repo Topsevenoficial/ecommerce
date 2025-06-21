@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "@/hooks/use-cart";
@@ -41,6 +41,28 @@ export function CartSheet() {
   const { open, setOpen } = useCartSheet();
   const router = useRouter();
 
+  // Handle browser back button to close the sheet
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePopState = () => {
+      setOpen(false);
+    };
+
+    // Add a new history entry when sheet opens
+    window.history.pushState({ isCartOpen: true }, '');
+    
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      // Only go back in history if the sheet is open
+      if (window.history.state?.isCartOpen) {
+        window.history.back();
+      }
+    };
+  }, [open, setOpen]);
+
   // Si estamos en la página de orden, no mostramos el carrito
   if (pathname === "/orden") {
     return null;
@@ -68,6 +90,8 @@ export function CartSheet() {
           side="right"
           className="w-full max-w-md"
           onCloseAutoFocus={(event) => event.preventDefault()}
+          onEscapeKeyDown={() => setOpen(false)}
+          onPointerDownOutside={() => setOpen(false)}
         >
           <SheetHeader>
             <div className="flex items-center space-x-2">

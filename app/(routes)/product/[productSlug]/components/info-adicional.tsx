@@ -1,15 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProductType } from "@/types/product";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, User } from "lucide-react";
+import { Star, User, ChevronRight, MessageSquare, FileText, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 // Usamos NonNullable para asegurarnos que reviews es un array
@@ -20,25 +24,24 @@ interface InfoAdicionalProps {
 }
 
 function Breadcrumb({ product }: { product: ProductType }) {
-  // Usamos una variable 'name' para almacenar el nombre del producto
   const name = product.productName || "Producto";
   return (
-    <nav className="mb-6 flex justify-center" aria-label="Breadcrumb">
-      <ol className="flex flex-wrap items-center justify-center gap-2 text-sm">
+    <nav className="mb-8" aria-label="Breadcrumb">
+      <ol className="flex items-center gap-2 text-sm text-muted-foreground">
         <li>
-          <a href="/" className="text-muted-foreground hover:text-foreground">
+          <a href="/" className="hover:text-foreground transition-colors">
             Inicio
           </a>
         </li>
-        <li className="text-muted-foreground/50">/</li>
+        <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
         <li>
-          <a href="/product" className="text-muted-foreground hover:text-foreground">
+          <a href="/product" className="hover:text-foreground transition-colors">
             Productos
           </a>
         </li>
-        <li className="text-muted-foreground/50">/</li>
-        <li aria-current="page" className="text-foreground font-semibold">
-          {name.length > 20 ? `${name.slice(0, 20)}...` : name}
+        <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+        <li className="font-medium text-foreground line-clamp-1">
+          {name}
         </li>
       </ol>
     </nav>
@@ -47,13 +50,13 @@ function Breadcrumb({ product }: { product: ProductType }) {
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
-    <div className="flex">
-      {[...Array(5)].map((_, i) => (
+    <div className="flex items-center">
+      {[1, 2, 3, 4, 5].map((star) => (
         <Star
-          key={i}
-          fill={i < rating ? "currentColor" : "none"}
-          className={`h-4 w-4 ${i < rating ? "text-yellow-500" : "text-muted"}`}
-          strokeWidth={1.5}
+          key={star}
+          fill={star <= rating ? "currentColor" : "none"}
+          className={`h-4 w-4 ${star <= rating ? "text-yellow-500" : "text-muted-foreground/30"}`}
+          strokeWidth={star <= rating ? 0 : 1.5}
         />
       ))}
     </div>
@@ -168,52 +171,79 @@ function AddReviewForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="bg-card rounded-lg shadow-sm border p-4 sm:p-6">
-      <div className="space-y-5">
-        <h3 className="font-semibold text-lg border-b pb-3">Dejar una reseña</h3>
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        <div>
-          <label className="block mb-2 text-sm font-medium">Email</label>
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setError("");
-            }}
-            className="bg-muted/50 focus:bg-background"
-            placeholder="tucorreo@ejemplo.com"
-          />
+    <Card className="border-none bg-muted/10 overflow-hidden">
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 text-primary" />
+          <CardTitle className="text-lg font-semibold">Dejar una reseña</CardTitle>
         </div>
-        <div>
-          <label className="block mb-2 text-sm font-medium">Valoración</label>
-          <StarRatingSelector rating={rating} setRating={setRating} />
-        </div>
-        <div>
-          <label className="block mb-2 text-sm font-medium">Comentario</label>
-          <Textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={4}
-            className="bg-muted/50 focus:bg-background"
-            placeholder="Escribe tu experiencia con el producto..."
-          />
-        </div>
-        <Button type="submit" className="w-full">
-          Enviar Reseña
-        </Button>
-      </div>
-    </form>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+          {error && (
+            <Alert variant="destructive" className="text-sm">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="email" className="text-sm font-medium">
+                Correo electrónico
+              </label>
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Lock className="h-3 w-3" /> No se mostrará en tu reseña
+              </span>
+            </div>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
+              placeholder="tu@email.com"
+              required
+              className="bg-background"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none">Valoración</label>
+            <div className="p-2 bg-muted/30 rounded-md">
+              <StarRatingSelector rating={rating} setRating={setRating} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none">Comentario</label>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={4}
+              className="bg-background min-h-[100px]"
+              placeholder="Escribe tu experiencia con el producto..."
+            />
+          </div>
+          <Button type="submit" className="w-full font-medium">
+            Enviar Reseña
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
 function ReviewsList({ reviews }: { reviews: Review[] }) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const prevReviewsLength = useRef(reviews?.length || 0);
+  
+  // Function to censor email for display
+  const censorEmail = (email: string) => {
+    const [username, domain] = email.split('@');
+    const censoredUsername = username.length > 2 
+      ? username[0] + '*'.repeat(3) + (username.length > 3 ? username.slice(-1) : '')
+      : '*'.repeat(3);
+    return `${censoredUsername}@${domain}`;
+  };
 
   useEffect(() => {
     const currentLength = reviews?.length || 0;
@@ -229,107 +259,152 @@ function ReviewsList({ reviews }: { reviews: Review[] }) {
 
   return (
     <>
-      <div className="mb-6">
-        {totalReviews > 0 ? (
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-semibold">Opiniones de clientes</h3>
+          {totalReviews > 0 && (
+            <Badge variant="outline" className="text-sm font-normal">
+              {totalReviews} {totalReviews === 1 ? 'reseña' : 'reseñas'}
+            </Badge>
+          )}
+        </div>
+        {totalReviews > 0 && (
           <div className="flex items-center gap-2">
             <StarRating rating={Math.round(averageRating)} />
-            <span className="text-sm text-muted-foreground">
-              {averageRating.toFixed(1)} de 5 ({totalReviews} reseña{totalReviews !== 1 ? "s" : ""})
+            <span className="text-sm font-medium">
+              {averageRating.toFixed(1)}/5
             </span>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">No hay reseñas aún</p>
         )}
       </div>
-      <ScrollArea ref={scrollAreaRef} className="h-[300px] sm:h-80">
-        <div className="space-y-4 pr-3">
-          {reviews && reviews.length > 0
-            ? reviews.map((review) => (
-                <div
-                  key={review.id}
-                  id={`review-${review.id}`}
-                  className="flex items-start gap-4 p-4 rounded-lg border bg-card shadow-sm hover:shadow-md transition-all"
-                >
-                  <Avatar className="mt-1 flex-shrink-0">
-                    <AvatarFallback className="bg-muted">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                      <div className="space-y-0.5">
-                        <p className="text-sm font-medium text-foreground truncate">
-                          {review.email}
-                        </p>
-                        <time className="text-xs text-muted-foreground">
-                          {new Date(review.createdAt).toLocaleDateString("es-ES", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </time>
+      
+      <div className="lg:h-[400px] lg:pr-3">
+        <div className="space-y-4">
+          {reviews && reviews.length > 0 ? (
+            reviews.map((review) => (
+              <Card key={review.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex gap-4">
+                    <Avatar className="h-10 w-10 border">
+                      <AvatarFallback className="bg-muted">
+                        <User className="h-5 w-5 text-muted-foreground" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-foreground">
+                              {censorEmail(review.email)}
+                            </p>
+                            <span className="text-xs text-muted-foreground" title="Correo protegido">
+                              <Lock className="h-3 w-3" />
+                            </span>
+                          </div>
+                          <time className="text-xs text-muted-foreground">
+                            {new Date(review.createdAt).toLocaleDateString("es-ES", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </time>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <StarRating rating={review.rating} />
+                        </div>
                       </div>
-                      <StarRating rating={review.rating} />
+                      {review.description && (
+                        <p className="mt-3 text-sm text-foreground leading-relaxed">
+                          {review.description}
+                        </p>
+                      )}
                     </div>
-                    {review.description && (
-                      <p className="text-sm text-foreground leading-relaxed mt-2 break-words">
-                        {review.description}
-                      </p>
-                    )}
                   </div>
-                </div>
-              ))
-            : null}
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="text-center py-8 border rounded-lg bg-muted/20">
+              <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+              <p className="text-muted-foreground">No hay reseñas aún</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">Sé el primero en opinar sobre este producto</p>
+            </div>
+          )}
         </div>
-      </ScrollArea>
+      </div>
     </>
   );
 }
 
 export default function InfoAdicional({ product }: InfoAdicionalProps) {
-  // Si product.reviews es undefined, usamos un array vacío.
   const [reviews, setReviews] = useState<Review[]>(product.reviews || []);
+  const reviewsSectionRef = useRef<HTMLElement>(null);
+
   const handleNewReview = (newReview: Review) => {
     setReviews((prev) => [newReview, ...prev]);
   };
 
+  // Efecto para manejar el scroll a la sección de reseñas
+  useEffect(() => {
+    const scrollToReviews = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('scroll') === 'reviews' && reviewsSectionRef.current) {
+        // Calcular la posición de desplazamiento con un offset para el encabezado fijo
+        const headerOffset = 100; // Ajusta este valor según la altura de tu encabezado
+        const elementPosition = reviewsSectionRef.current.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+        
+        // Limpiar el parámetro de la URL sin recargar la página
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('scroll');
+        window.history.replaceState({}, '', newUrl.toString());
+      }
+    };
+
+    // Pequeño retraso para asegurar que el DOM esté listo
+    const timer = setTimeout(scrollToReviews, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   if (!product) return null;
-  const { description } = product;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <Breadcrumb product={product} />
-      <Tabs defaultValue="description" className="w-full">
-        <TabsList className="flex flex-nowrap sm:justify-center w-full overflow-x-auto">
-          <TabsTrigger value="description" className="flex-shrink-0">
-            Descripción
-          </TabsTrigger>
-          <TabsTrigger value="reviews" className="flex-shrink-0">
-            Reseñas
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="description" className="pt-4 text-center">
-          {description ? (
-            <div className="text-sm leading-relaxed max-w-2xl mx-auto px-4">
-              {description}
+    <section ref={reviewsSectionRef} id="reviews-section" className="py-8 sm:py-12 bg-background border-t">
+      <div className="container max-w-4xl px-4 mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            Opiniones de clientes
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Lo que dicen nuestros clientes sobre este producto
+          </p>
+          
+          {reviews.length > 0 && (
+            <div className="mt-4 flex justify-center items-center gap-2">
+              <StarRating rating={Math.round(
+                reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+              )} />
+              <span className="font-medium text-foreground">
+                {reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}
+              </span>
             </div>
-          ) : (
-            <p className="text-center text-sm text-muted-foreground">
-              No hay descripción para este producto.
-            </p>
           )}
-        </TabsContent>
-        <TabsContent value="reviews" className="pt-4">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="w-full lg:w-[60%]">
-              <ReviewsList reviews={reviews} />
-            </div>
-            <div className="w-full lg:w-[40%]">
-              <AddReviewForm productId={product.id} onReviewAdded={handleNewReview} />
-            </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <ReviewsList reviews={reviews} />
           </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+          <div className="lg:sticky lg:top-6 lg:h-fit">
+            <AddReviewForm productId={product.id} onReviewAdded={handleNewReview} />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -38,6 +38,7 @@ export interface ProductType {
   antiImpacto?: boolean;
   barreraDeslumbramiento?: boolean;
   limpiaFacil?: boolean;
+  stock?: number;
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;

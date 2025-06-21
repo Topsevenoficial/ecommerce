@@ -44,10 +44,19 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
     }
   );
 
-  const sortedProducts = flattenedProducts.sort((a, b) => {
-    if (a.isFeatured && !b.isFeatured) return -1;
-    if (!a.isFeatured && b.isFeatured) return 1;
-    return 0;
+  const sortedProducts = [...flattenedProducts].sort((a, b) => {
+    const aStock = a.stock ?? 0;
+    const bStock = b.stock ?? 0;
+    
+    // Primero, manejar el caso de productos agotados (siempre al final)
+    if (aStock <= 0 && bStock > 0) return 1;  // a va al final
+    if (aStock > 0 && bStock <= 0) return -1; // b va al final
+    
+    // Si ambos están agotados o ambos tienen stock, ordenar por destacado
+    if (a.isFeatured && !b.isFeatured) return -1; // a primero si es destacado
+    if (!a.isFeatured && b.isFeatured) return 1;  // b primero si es destacado
+    
+    return 0; // Mantener orden original en otros casos
   });
 
   return (

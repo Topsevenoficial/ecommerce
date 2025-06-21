@@ -108,48 +108,63 @@ export function ProductCard({ product, badge }: ProductCardProps) {
         {/* Renderizamos `badge` (si llega) */}
         {badge}
 
-        {/* Overlay "AGOTADO" si el producto no está activo */}
-        {!active && (
-          <div className="absolute inset-0 bg-black/60 z-30 flex items-center justify-center">
-            <div className="text-white font-bold text-xl">AGOTADO</div>
-          </div>
-        )}
-
         {/* Imagen principal */}
         <div
           className="relative group"
           onMouseEnter={handleMainImageMouseEnter}
           onMouseLeave={handleMainImageMouseLeave}
         >
-          <Image
-            src={currentImageUrl}
-            alt={`${productName} image`}
-            width={500}
-            height={500}
-            priority
-            className={`w-full h-auto object-cover transition-transform duration-300 ease-in-out ${
-              hoveringMainImage && images.length > 1 ? "scale-105" : ""
-            } ${!active ? "opacity-50" : ""}`}
-          />
+          <div className="relative">
+            <Image
+              src={currentImageUrl}
+              alt={`${productName} image`}
+              width={500}
+              height={500}
+              priority
+              className={`w-full h-auto object-cover transition-transform duration-300 ease-in-out ${
+                hoveringMainImage && images.length > 1 ? "scale-105" : ""
+              } ${!active ? "opacity-50" : ""} ${
+                (product.stock === 0 || product.stock === null || product.stock === undefined) ? "opacity-70" : ""
+              }`}
+            />
+            {(product.stock === 0 || product.stock === null || product.stock === undefined) && (
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="absolute inset-0 bg-black/40"></div>
+                <div className="relative z-20 transform rotate-[-15deg] text-center p-4">
+                  <div className="bg-red-700/90 text-white font-bold text-2xl md:text-3xl px-6 py-3 rounded-lg shadow-xl border-2 border-red-500/50">
+                    AGOTADO
+                  </div>
+                  <div className="absolute -bottom-2 left-1/2 w-40 h-1.5 bg-red-900/70 -translate-x-1/2 blur-sm"></div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Botón para añadir al carrito */}
           {active && (
             <div
-              className="
+              className={`
                 absolute bottom-4 left-4
                 transition duration-200 z-10
-                opacity-100 md:opacity-0 md:group-hover:opacity-100
-              "
+                ${(product.stock === 0 || product.stock === null || product.stock === undefined) ? 'opacity-100' : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'}
+              `}
             >
               <Button
                 onClick={handleAddToCart}
                 variant="default"
                 size="sm"
                 aria-label="Añadir al carrito"
-                className="font-semibold flex items-center gap-1"
+                className={`font-semibold flex items-center gap-1 ${
+                  (product.stock === 0 || product.stock === null || product.stock === undefined) 
+                    ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' 
+                    : ''
+                }`}
+                disabled={product.stock === 0 || product.stock === null || product.stock === undefined}
               >
                 <ShoppingCart size={18} />
-                Añadir
+                {(product.stock === 0 || product.stock === null || product.stock === undefined) 
+                  ? 'Agotado' 
+                  : 'Añadir'}
               </Button>
             </div>
           )}
@@ -188,11 +203,37 @@ export function ProductCard({ product, badge }: ProductCardProps) {
           </div>
           {active && (
             <div className="relative flex items-center mt-1">
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full rounded-full animate-ping bg-gradient-to-r from-green-300 to-green-400 opacity-80" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
-              </span>
-              <span className="ml-2 text-sm">En stock</span>
+              {product.stock === null || product.stock === undefined || product.stock === 0 ? (
+                <>
+                  <span className="relative flex h-3 w-3">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-80" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+                  </span>
+                  <span className="ml-2 text-sm text-red-600 dark:text-red-500">
+                    Sin stock
+                  </span>
+                </>
+              ) : product.stock < 5 ? (
+                <>
+                  <span className="relative flex h-3 w-3">
+                    <span className="absolute inline-flex h-full w-full rounded-full animate-ping bg-amber-400 opacity-80" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500" />
+                  </span>
+                  <span className="ml-2 text-sm text-amber-600 dark:text-amber-500">
+                    {product.stock === 1 ? '¡Última unidad!' : `¡Solo ${product.stock} unidades!`}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="relative flex h-3 w-3">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+                  </span>
+                  <span className="ml-2 text-sm text-green-600 dark:text-green-500">
+                    En stock
+                  </span>
+                </>
+              )}
             </div>
           )}
         </CardContent>
