@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import { ProductType } from "@/types/product";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star, User, ChevronRight, MessageSquare, Lock } from "lucide-react";
@@ -20,8 +19,10 @@ interface InfoAdicionalProps {
   product: ProductType;
 }
 
+// Componente Breadcrumb comentado temporalmente
+/*
 function Breadcrumb({ product }: { product: ProductType }) {
-  const name = product.productName || "Producto";
+  const name = product.nombre || "Producto";
   return (
     <nav className="mb-8" aria-label="Breadcrumb">
       <ol className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -44,6 +45,7 @@ function Breadcrumb({ product }: { product: ProductType }) {
     </nav>
   );
 }
+*/
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (

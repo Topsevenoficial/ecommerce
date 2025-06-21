@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sheet";
 
 // Icons
-import { Package, ShieldCheck, Truck, CreditCard, Ruler, Info } from "lucide-react";
+import { Package, ShieldCheck, Truck, CreditCard, Ruler } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 
 // Hooks
@@ -47,7 +47,6 @@ interface ProductInfoProps {
 export default function ProductInfo({ product }: ProductInfoProps) {
   const { addItem } = useCart();
   const { setOpen } = useCartSheet();
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathname = usePathname();
 
