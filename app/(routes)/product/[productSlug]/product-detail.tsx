@@ -15,7 +15,6 @@ import { ProductType } from "@/types/product"; // Asegúrate de que la ruta sea 
 import useSWR from 'swr';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { MessageSquare, CreditCard, Truck, Package, AlertTriangle, RefreshCw, Shield, ExternalLink, CheckCircle2, Lock } from "lucide-react";
 
 interface ProductDetailProps {

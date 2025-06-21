@@ -42,7 +42,6 @@ export const generateMetadata = async ({ params }: { params: Promise<PageParams>
   
   const productName = product.nombre || 'Producto sin nombre';
   const description = product.descripcion?.substring(0, 160) || 'Descripción no disponible';
-  const price = product.precio ? `$${product.precio.toFixed(2)}` : 'Precio no disponible';
   
   return {
     title: productName,

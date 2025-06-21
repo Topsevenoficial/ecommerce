@@ -9,18 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger 
 } from "@/components/ui/sheet";
 
 // Icons
-import { Package, ShieldCheck, CheckCircle, Truck, RefreshCw, CreditCard, Info, Ruler } from "lucide-react";
+import { Package, ShieldCheck, Truck, CreditCard, Ruler, Info } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 
 // Hooks
@@ -49,6 +47,7 @@ interface ProductInfoProps {
 export default function ProductInfo({ product }: ProductInfoProps) {
   const { addItem } = useCart();
   const { setOpen } = useCartSheet();
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathname = usePathname();
 
