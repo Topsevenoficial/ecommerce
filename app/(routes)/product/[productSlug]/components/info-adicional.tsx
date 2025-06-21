@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ProductType } from "@/types/product";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, User, ChevronRight, MessageSquare, Lock } from "lucide-react";
+import { Star, User, MessageSquare, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

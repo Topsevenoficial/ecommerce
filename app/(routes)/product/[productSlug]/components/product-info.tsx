@@ -78,7 +78,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
   const activeFeatures = Object.entries(PROTECTION_FEATURES)
     .filter(([key]) => product[key as keyof typeof PROTECTION_FEATURES])
-    .map(([_, value]) => value);
+    .map(([, value]) => value);
 
   const handleAddToCart = () => {
     addItem(product);
